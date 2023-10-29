@@ -1,0 +1,32 @@
+[
+  {
+    "title": "cerveza",
+    "price": "1500",
+    "description": "cerveza negra",
+    "code": "18asa",
+    "stock": "155",
+    "status": "true",
+    "category": "bebidas",
+    "id": 1
+  },
+  {
+    "id": 2,
+    "title": "tequila",
+    "description": "leche la serenisima",
+    "price": "25000",
+    "code": "asddffd",
+    "stock": "true",
+    "status": "true",
+    "category": "bebidas"
+  },
+  {
+    "id": 3,
+    "title": "Leche entera",
+    "description": "leche la serenisima",
+    "price": "1500",
+    "code": "asddffd",
+    "stock": "true",
+    "status": "true",
+    "category": "bebidas"
+  }
+]
