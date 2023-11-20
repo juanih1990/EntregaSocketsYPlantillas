@@ -1,4 +1,5 @@
 <div>
+    <h1> Productos desde de FleSystem</h1>
     {{#each products }}
     <hr>
     <ul>
@@ -8,3 +9,75 @@
     <hr>
     {{/each}}
 </div>
+
+<div>
+    <h1> Productos de base da datos Mongo </h1>
+    {{#each Productos}}
+    <hr>
+    <ul>
+        <li><span>Producto: {{this.title}}</span></li>
+        <li><span>Precio: {{this.price}}</span></li>
+        <li><span>Stock: {{this.stock}}</span></li>
+        <hr>
+        <button class="delete" data-product-id="{{this._id}}">Delete</button>
+        <button class="add" data-cart-id="{{this._id}}">Agregar al carrito</button>
+    </ul>
+    <hr>
+    {{/each}}
+
+</div>
+
+<div>
+     <h1> Carrito </h1>
+    {{#if cartItem}}
+        {{#each cartItem}}
+            <hr>
+            <ul>
+                <li><span>Producto: {{this.title}}</span></li>
+                <li><span>Precio: {{this.price}}</span></li>
+                <li><span>Cantidad: {{this.quantity}}</span></li>
+            </ul>
+            <hr>
+        {{/each}}
+    {{/if}}
+
+</div>
+
+
+<script>
+    const deleteButtons = document.querySelectorAll('.delete')
+    deleteButtons.forEach(button => {
+        button.onclick = e => {
+            const id = button.dataset.productId;
+
+            fetch(`/productos/${id}`, { method: 'delete' })
+                .then(() => {
+                    alert('Eliminado con éxito' + id);
+                    document.location.href = '/productos';
+                    console.log(id);
+                })
+                .catch(e => {
+                    alert('No se puede eliminar el producto');
+                });
+        };
+    });
+
+
+
+    const addToCart = document.querySelectorAll('.add')
+    addToCart.forEach(button => {
+        button.onclick = e => {
+            const id = button.dataset.cartId;
+
+             fetch(`/productos/${id}`, { method: 'post' })
+                .then(() => {
+                    alert('Se agrego el producto' + id + " al carrito");
+                    document.location.href = '/productos';
+                    console.log(id);
+                })
+                .catch(e => {
+                    alert(e);
+                });
+        };
+    });
+</script>

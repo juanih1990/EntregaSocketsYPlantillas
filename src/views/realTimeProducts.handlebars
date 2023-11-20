@@ -8,33 +8,33 @@
 </div>
 <script src="/socket.io/socket.io.js"></script>
 <script>
-  const socket = io();
+  const socket = io()
   const productList = document.getElementById('productList');
 
   // Función para agregar un producto a la lista
   function addProductToUI(product) {
-    const productDiv = document.createElement('div');
-    productDiv.innerHTML = `<span>${product.title} - ${product.price}</span>`;
-    productList.appendChild(productDiv);
+    const productDiv = document.createElement('div')
+    productDiv.innerHTML = `<span>${product.title} - ${product.price}</span>`
+    productList.appendChild(productDiv)
   }
 
   // Inicializa la lista de productos desde los datos iniciales en la página
   const initialProducts = [...document.querySelectorAll('#productList div')].map((productDiv) => {
-    const title = productDiv.querySelector('span').textContent.split(' - ')[0];
-    const price = productDiv.querySelector('span').textContent.split(' - ')[1];
-    return { title, price };
-  });
+    const title = productDiv.querySelector('span').textContent.split(' - ')[0]
+    const price = productDiv.querySelector('span').textContent.split(' - ')[1]
+    return { title, price }
+  })
 
-  initialProducts.forEach((product) => addProductToUI(product));
+  initialProducts.forEach((product) => addProductToUI(product))
 
   // Escucha el evento 'updateProducto'
   socket.on('updateProducto', (productos) => {
     // Limpia la lista de productos
-    productList.innerHTML = '';
+    productList.innerHTML = ''
 
     // Agrega los productos actualizados a la lista
     productos.forEach((producto) => {
-      addProductToUI(producto);
-    });
-  });
+      addProductToUI(producto)
+    })
+  })
 </script>

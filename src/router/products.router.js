@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import ProductManager from '../ProductManager.js'; // Asegúrate de proporcionar la ruta correcta
+import ProductManager from '../dao/managers/ProductManager.js'; // Asegúrate de proporcionar la ruta correcta
 import multer from 'multer'
 import { Socket } from 'socket.io';
 
