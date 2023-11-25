@@ -9,7 +9,7 @@ const cartManagerMongo = new CartManagerMongo()
 
 
 router.post('/:id' , (req,res) => {
-    try {
+    try {  
       const {id} = req.params
       cartManagerMongo.createCart(id)
       res.redirect('/productos')
