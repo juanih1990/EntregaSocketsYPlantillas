@@ -1,0 +1,65 @@
+<div>
+    <h1>hola</h1>
+    {{#if result}}
+     <input id="idCarrito" type="hidden" value="{{result.[0]._id}}">
+    <ul>
+        <hr>
+        <li><span>Producto: {{this.pid.title}}</span></li>
+        <li><span>Precio: {{this.pid.price}}</span></li>
+        <li><span>Categoria: {{this.pid.category}}</span></li><br><br>
+        <li>
+            <button id="restar" data-subtract-num="{{this.pid._id}}">-</button>
+            <span id="quantity" value="{{this.quantity}}"> Cantidad: {{this.quantity}}</span>
+            <button id="sumar" data-add-num="{{this.pid._id}}">+</button>
+        </li>
+        <hr>
+    </ul>
+    {{/if}}
+</div>
+<script>
+    const sumar = document.querySelectorAll('#sumar')
+    sumar.forEach(button => {
+        button.onclick = e => {
+
+            const pid = button.dataset.addNum
+            const idcart = document.querySelector('#idCarrito').value
+            console.log(pid + idcart)
+            fetch(`/productos/cart/${idcart}/products/${pid}?operacion=sumar`, { method: 'put' })
+                .then(() => {
+                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
+                })
+                .catch(e => {
+                    alert('No se puede eliminar el producto');
+                });
+        }
+    })
+    const restar = document.querySelectorAll('#restar')
+    restar.forEach(button => {
+        button.onclick = e => {
+            const cantidad =  document.querySelector('#quantity')
+            const pid = button.dataset.subtractNum
+            const idcart = document.querySelector('#idCarrito').value
+            console.log(pid + idcart)
+            if(cantidad > 1){
+                fetch(`/productos/cart/${idcart}/products/${pid}?operacion=restar`, { method: 'put' })
+                .then(() => {
+                    console.log("producto actualizado")
+                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
+                })
+                .catch(e => {
+                    alert('No se puede eliminar el producto');
+                });
+            }
+            else{
+                 fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
+                .then(() => {
+                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
+                })
+                .catch(e => {
+                    alert('No se puede eliminar el producto');
+                });
+            }
+            
+        }
+    })
+</script>

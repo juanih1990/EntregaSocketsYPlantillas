@@ -1,0 +1,62 @@
+<div>
+    {{#if result}}
+    <h2>Carrito ID: {{result.[0]._id}}</h2>
+    <hr>
+    <input id="idCarrito" type="hidden" value="{{result.[0]._id}}">
+    <ul>
+        {{#each result.[0].productos}}
+        <hr>
+        <li><span>Producto: {{this.pid.title}}</span></li>
+        <li><span>Precio: {{this.pid.price}}</span></li>
+        <li><span>Categoria: {{this.pid.category}}</span></li>
+        <li><span>Cantidad: {{this.quantity}}</span></li>
+        <hr>
+        <button id="delete" data-delete-pid="{{this.pid._id}}">Borrar Producto</button>
+        <button id="viewDetail" data-viewDetail-id="{{this._id}}">Mostrar Detalle</button>
+        {{/each}}
+    </ul>
+
+    <hr>
+    {{else}}
+    <p>El carrito está vacío. ¡Comienza a comprar!</p>
+    {{/if}}
+
+</div>
+<script>
+
+    const deleteButtons = document.querySelectorAll('#delete')
+    deleteButtons.forEach(button => {
+        button.onclick = e => {
+
+            const pid = button.dataset.deletePid
+            const idcart = document.querySelector('#idCarrito').value
+            console.log(pid + idcart)
+            fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
+                .then(() => {
+                    document.location.href = `/productos/cart/${idcart}`;
+                })
+                .catch(e => {
+                    alert('No se puede eliminar el producto');
+                });
+        }
+    })
+
+   
+     const viewDetail = document.querySelectorAll('#viewDetail')
+    viewDetail.onclick = () => {
+        const idcart = document.querySelector('#idCarrito').value
+         const pid = button.dataset.viewDetailId
+         fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'get' })
+                .then(() => {
+                     document.location.href = `/productos/cart/${pid}?view=cartProductDetail`
+                })
+                .catch(e => {
+                    alert('No se puede mostrar la pagina');
+                });
+       
+    };
+
+
+
+
+</script>

@@ -1,4 +1,6 @@
 import mongoose from 'mongoose'
+import mongoosePaginate from 'mongoose-paginate-v2'
+
 const cartCollection = 'cart'
 const cartSchema = new mongoose.Schema({
     productos: [
@@ -23,6 +25,8 @@ const cartSchema = new mongoose.Schema({
 cartSchema.pre('find' , function() {
     this.populate('productos.pid')
 })
+
+cartSchema.plugin(mongoosePaginate)
 
 const CartMongo = mongoose.model(cartCollection, cartSchema)
 

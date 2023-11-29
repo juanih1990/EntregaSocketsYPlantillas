@@ -1,0 +1,47 @@
+<div>
+    <h1> Carrito </h1>
+    {{#if result.cartItem}}
+ 
+       {{#each result.cartItem}}
+ 
+
+      {{#if this.productos.[0].pid}}
+            <hr>
+            <h2>Numero de compra ( id: {{this._id}} ) estado: {{#unless this.finalizado}} En proceso {{else}} Cerrado{{/unless}}
+            </h2>
+            <button id="deleteCart" data-delete-Cartid="{{this._id}}">Borrar Carrito</button>
+            <button id="openCart" data-open-cartid="{{this._id}}">Abrir Carrito</button>
+            <hr>
+              {{else}}
+            <p>El carrito está vacío. ¡Comienza a comprar!</p>
+        {{/if}}
+            {{/each}}
+
+
+          
+
+    {{/if}}
+
+</div>
+<script>
+    const deleteTotalCart = document.querySelector("#deleteCart");
+    deleteTotalCart.onclick = () => {
+        const _id = deleteTotalCart.dataset.deleteCartid;
+
+        fetch(`/productos/cart/${_id}`, { method: 'delete' })
+            .then(() => {
+                document.location.href = '/productos/cart';
+            })
+            .catch(e => {
+                alert('No se puede eliminar el producto');
+            });
+    };
+
+    const openCartButton = document.getElementById('openCart');
+    openCartButton.onclick = () => {
+        const cartId = openCartButton.dataset.openCartid;
+        document.location.href = `/productos/cart/${cartId}`;
+    };
+
+
+</script>
