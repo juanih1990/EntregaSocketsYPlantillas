@@ -12,7 +12,8 @@
         <li><span>Cantidad: {{this.quantity}}</span></li>
         <hr>
         <button id="delete" data-delete-pid="{{this.pid._id}}">Borrar Producto</button>
-        <button id="viewDetail" data-viewDetail-id="{{this._id}}">Mostrar Detalle</button>
+        <button id="viewDetail" data-viewdetail-product="{{this.pid._id}}">Mostrar Detalle</button>
+        {{this.pid._id}}        
         {{/each}}
     </ul>
 
@@ -41,20 +42,25 @@
         }
     })
 
-   
-     const viewDetail = document.querySelectorAll('#viewDetail')
-    viewDetail.onclick = () => {
-        const idcart = document.querySelector('#idCarrito').value
-         const pid = button.dataset.viewDetailId
-         fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'get' })
+
+    const viewDetail = document.querySelectorAll('#viewDetail')
+    viewDetail.forEach(button => {
+        button.onclick = e => {
+
+            const pid =  button.dataset.viewdetailProduct
+            const idcart = document.querySelector('#idCarrito').value
+            console.log(pid , " " ,idcart)
+            fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'get' })
                 .then(() => {
-                     document.location.href = `/productos/cart/${pid}?view=cartProductDetail`
+                    console.log("entro me redirige")
+                    document.location.href = `/productos/cart/${idcart}/products/${pid}`
                 })
                 .catch(e => {
                     alert('No se puede mostrar la pagina');
                 });
-       
-    };
+            
+        };
+    })
 
 
 

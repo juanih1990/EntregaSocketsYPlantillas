@@ -80,20 +80,43 @@ router.get('/cart', async (req, res) => {
 })
 
 router.get('/cart/:_id', async (req, res) => {
-  // Obtén el _id del carrito desde los parámetros de la URL
-  const { _id } = req.params;
-  const result = await cartManagerMongo.getCart(_id)
-  res.render('cartDetail', { result });
+    const { _id } = req.params;
+    const result = await cartManagerMongo.getCart(_id)
+    res.render('cartDetail', { result });
 });
 
-
-//Esta  vista es para el detalle del producto donde despues con el put, le voy a actualizar la cantidad 
-router.get('/cart/:_id/products/:pid', async (req, res) => {
-  // Obtén el _id del carrito desde los parámetros de la URL
-  const { _id, pid } = req.params
+router.get('/cart/:_id/products/:pid' , async(req,res) =>{
+  const { _id , pid } = req.params;
+  
   const result = await cartManagerMongo.getCartDetailProduct(_id,pid)
-  res.render('cartProductDetail', { result });
-});
+
+ 
+    // Extraer las propiedades específicas
+    const { title, price, description, stock, thumbnail, code, category } = result.pid;
+
+    // Obtener quantity directamente de result
+    const { quantity } = result;
+
+    // Crear un nuevo objeto con las propiedades deseadas
+    const producto = {
+      pid ,
+      _id,
+      title,
+      price,
+      description,
+      quantity,
+      stock,
+      thumbnail,
+      code,
+      category
+    };
+
+    console.log(producto);
+  
+  res.render('cartProductDetail',  { producto } )
+})
+
+
 
 
 

@@ -1,23 +1,24 @@
-<div>
-    <h1>hola</h1>
-    {{#if result}}
-     <input id="idCarrito" type="hidden" value="{{result.[0]._id}}">
-    <ul>
-        <hr>
-        <li><span>Producto: {{this.pid.title}}</span></li>
-        <li><span>Precio: {{this.pid.price}}</span></li>
-        <li><span>Categoria: {{this.pid.category}}</span></li><br><br>
-        <li>
-            <button id="restar" data-subtract-num="{{this.pid._id}}">-</button>
-            <span id="quantity" value="{{this.quantity}}"> Cantidad: {{this.quantity}}</span>
-            <button id="sumar" data-add-num="{{this.pid._id}}">+</button>
-        </li>
-        <hr>
-    </ul>
-    {{/if}}
+<div>   
+     {{#if producto}}
+
+        <input id="idCarrito" type="hidden" value="{{producto._id}}">
+        <ul>
+            <hr>
+            <li><span>Producto: {{producto.title}}</span></li>
+            <li><span>Precio: {{producto.price}}</span></li>
+            <li><span>Categoria: {{producto.category}}</span></li><br><br>
+            <li>
+                <button id="restar" data-subtract-num="{{producto.pid}}">-</button>
+                <span id="quantity" data-value="{{producto.quantity}}"> Cantidad: {{producto.quantity}}</span>
+                <button id="sumar" data-add-num="{{producto.pid}}">+</button>
+            </li>
+            <hr>
+        </ul>
+    {{/if}}  
 </div>
 <script>
-    const sumar = document.querySelectorAll('#sumar')
+
+     const sumar = document.querySelectorAll('#sumar')
     sumar.forEach(button => {
         button.onclick = e => {
 
@@ -26,40 +27,43 @@
             console.log(pid + idcart)
             fetch(`/productos/cart/${idcart}/products/${pid}?operacion=sumar`, { method: 'put' })
                 .then(() => {
-                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
+                    document.location.href = `/productos/cart/${idcart}/products/${pid}`;
                 })
                 .catch(e => {
-                    alert('No se puede eliminar el producto');
+                    alert('No se puede modificar el producto');
                 });
         }
     })
     const restar = document.querySelectorAll('#restar')
     restar.forEach(button => {
         button.onclick = e => {
-            const cantidad =  document.querySelector('#quantity')
+            const cantidadSpan = document.querySelector('#quantity');
+            const cantidad =  parseInt(cantidadSpan.getAttribute('data-value'), 10);
             const pid = button.dataset.subtractNum
             const idcart = document.querySelector('#idCarrito').value
-            console.log(pid + idcart)
+            console.log(pid + idcart + cantidad)
             if(cantidad > 1){
+                console.log("entro a cantidad mayor a 1")
                 fetch(`/productos/cart/${idcart}/products/${pid}?operacion=restar`, { method: 'put' })
                 .then(() => {
                     console.log("producto actualizado")
-                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
+                    document.location.href = `/productos/cart/${idcart}/products/${pid}`
                 })
                 .catch(e => {
-                    alert('No se puede eliminar el producto');
+                    alert('No se puede modificar el producto');
                 });
             }
             else{
-                 fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
-                .then(() => {
-                    document.location.href = `/productos/cart/${idcart}?view=cartProductDetail`;
-                })
-                .catch(e => {
-                    alert('No se puede eliminar el producto');
-                });
+                // fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
+                //.then(() => {
+                    console.log("cuando llega a cero deberia eliminar el producto pero estoy teniendo problemas con esta linea")
+                  //  document.location.href = `/productos/cart/${idcart}/products/${pid}`;
+               // })
+               // .catch(e => {
+               //     alert('No se puede modificar el producto');
+               // });
             }
             
         }
-    })
+    }) 
 </script>

@@ -192,19 +192,20 @@ class CardManagersMongo {
 
     getCartDetailProduct = async (cid, pid) => {
         try {
-            const cart = await CartMongo.findById(cid);
-
+            const cart = await CartMongo.findOne({ _id: cid }).populate('productos.pid');
+    
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-
-            const productoEnCarrito = cart.productos.find(producto => producto.pid.equals(pid));
+    
+            const productoEnCarrito = cart.productos.find(producto => producto.pid.equals(pid))
 
             if (!productoEnCarrito) {
                 throw new Error('Producto no encontrado en el carrito');
             }
-
-            return productoEnCarrito;
+    
+            return productoEnCarrito
+             
         } catch (error) {
             console.error('Error al obtener el detalle del producto en el carrito', error);
             throw error;

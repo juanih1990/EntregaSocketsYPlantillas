@@ -15,13 +15,21 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
+
+
 //mongoose
 const mongoURL = 'mongodb+srv://juanih1990:963258527415963@clustercursobackend.ddoeaet.mongodb.net/'
 const mongoDBName = 'productos'
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-//Inicializo el motor de plantilla 
+
+
+
+
+
+
+  
 app.engine('handlebars', handlebars.engine())
 //seteo las vistas 
 app.set('views', __dirname + '/views')
