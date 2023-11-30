@@ -1,10 +1,10 @@
 import { Router } from 'express'
 import ProductsModel from '../dao/models/products.model.js'
 import ProductManagerMongo from "../dao/managers/managersMongo/ProductManagersMongo.js"
-import ProductsMongo from '../dao/models/products.model.js';
+import ProductsMongo from '../dao/models/products.model.js'
 
-const router = Router();
-const productManagerMongo = new ProductManagerMongo();
+const router = Router()
+const productManagerMongo = new ProductManagerMongo()
 
 
 router.post('/', (req, res) => {
@@ -15,7 +15,6 @@ router.post('/', (req, res) => {
   } catch (error) {
     res.send('Error al crear el producto' + error)
   }
-
 })
 
 router.get('/', async (req, res) => {
@@ -23,20 +22,20 @@ router.get('/', async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
-  const sortField = req.query?.sort ?? 'title';
-  const sortOrder = req.query?.order ?? 'asc';
-  const category = req.query?.category || '';
-  const stockOnly = req.query?.stockOnly === 'true';
+  const sortField = req.query?.sort ?? 'title'
+  const sortOrder = req.query?.order ?? 'asc'
+  const category = req.query?.category || ''
+  const stockOnly = req.query?.stockOnly === 'true'
 
 
   const search = {}
   console.log("categoria: " + category)
   if (category) {
-    search.category = category;
+    search.category = category
   }
 
   if (stockOnly) {
-    search.stock = { $gt: 0 };
+    search.stock = { $gt: 0 }
   }
 
   if (query) search.title = { "$regex": query, "$options": "i" }

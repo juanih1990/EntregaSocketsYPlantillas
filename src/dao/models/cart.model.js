@@ -22,7 +22,7 @@ const cartSchema = new mongoose.Schema({
         default: false, // Por defecto, un carrito no está finalizado
     },
 })
-cartSchema.pre('find' , function() {
+cartSchema.pre('find', function () {
     this.populate('productos.pid')
 })
 

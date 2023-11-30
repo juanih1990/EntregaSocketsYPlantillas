@@ -13,7 +13,6 @@
         <hr>
         <button id="delete" data-delete-pid="{{this.pid._id}}">Borrar Producto</button>
         <button id="viewDetail" data-viewdetail-product="{{this.pid._id}}">Mostrar Detalle</button>
-        {{this.pid._id}}        
         {{/each}}
     </ul>
 
@@ -28,16 +27,14 @@
     const deleteButtons = document.querySelectorAll('#delete')
     deleteButtons.forEach(button => {
         button.onclick = e => {
-
             const pid = button.dataset.deletePid
             const idcart = document.querySelector('#idCarrito').value
-            console.log(pid + idcart)
             fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
                 .then(() => {
-                    document.location.href = `/productos/cart/${idcart}`;
+                    document.location.href = `/productos/cart/${idcart}`
                 })
                 .catch(e => {
-                    alert('No se puede eliminar el producto');
+                    alert('No se puede eliminar el producto')
                 });
         }
     })
@@ -46,19 +43,16 @@
     const viewDetail = document.querySelectorAll('#viewDetail')
     viewDetail.forEach(button => {
         button.onclick = e => {
-
-            const pid =  button.dataset.viewdetailProduct
+            const pid = button.dataset.viewdetailProduct
             const idcart = document.querySelector('#idCarrito').value
-            console.log(pid , " " ,idcart)
             fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'get' })
                 .then(() => {
                     console.log("entro me redirige")
                     document.location.href = `/productos/cart/${idcart}/products/${pid}`
                 })
                 .catch(e => {
-                    alert('No se puede mostrar la pagina');
+                    alert('No se puede mostrar la pagina')
                 });
-            
         };
     })
 

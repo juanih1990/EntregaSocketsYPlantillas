@@ -1,15 +1,10 @@
 import { Router } from 'express'
 import CartManagerMongo from '../dao/managers/managersMongo/CartManagersMongo.js'
 import CartModel from '../dao/models/cart.model.js'
-//import ProductManagerMongo from "../dao/managers/managersMongo/ProductManagersMongo.js"
-
 
 const router = Router()
-//const productManagerMongo = new ProductManagerMongo()
 const cartManagerMongo = new CartManagerMongo()
 
-
-//Borrar Todos los productos del carrito.
 router.delete('/cart/:_id', async (req, res) => {
   try {
     const { _id } = req.params
@@ -20,31 +15,29 @@ router.delete('/cart/:_id', async (req, res) => {
   }
 })
 
-//Borrar Productos del carrito
 router.delete('/cart/:_id/products/:pid', async (req, res) => {
   try {
     const { _id, pid } = req.params
     await cartManagerMongo.deleteCart(_id, pid)
     return res.json({ status: "success" })
   } catch (error) {
-    console.error('Error al eliminar el producto del carrito', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error al eliminar el producto del carrito', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 
+//crea el carrito cuado dan click en agregar producto.  dentro de localhost:8080/productos
 router.post('/:pid', async (req, res) => {
   try {
     const { pid } = req.params
     await cartManagerMongo.createCart(pid)
-
     res.redirect('/productos')
   } catch (error) {
     res.send('Error al agregar el producto al carrito' + error)
   }
-
 })
+
 router.get('/cart', async (req, res) => {
-  //aca voy a hacer la paginacion
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -54,11 +47,11 @@ router.get('/cart', async (req, res) => {
   const stockOnly = req.query?.stockOnly === 'true';
   const search = {}
   if (category) {
-    search.category = category;
+    search.category = category
   }
 
   if (stockOnly) {
-    search.stock = { $gt: 0 };
+    search.stock = { $gt: 0 }
   }
 
   if (query) search.title = { "$regex": query, "$options": "i" }
@@ -91,11 +84,9 @@ router.get('/cart/:_id/products/:pid' , async(req,res) =>{
   const result = await cartManagerMongo.getCartDetailProduct(_id,pid)
 
  
-    // Extraer las propiedades específicas
-    const { title, price, description, stock, thumbnail, code, category } = result.pid;
+    const { title, price, description, stock, thumbnail, code, category } = result.pid
 
-    // Obtener quantity directamente de result
-    const { quantity } = result;
+    const { quantity } = result
 
     // Crear un nuevo objeto con las propiedades deseadas
     const producto = {
@@ -116,19 +107,15 @@ router.get('/cart/:_id/products/:pid' , async(req,res) =>{
   res.render('cartProductDetail',  { producto } )
 })
 
-
-
-
-
 router.put('/cart/:_id', async (req, res) => {   // este endpoint lo deje para trabajarlo por posman por que no le vi mucho sentido para implementarlo en las vistas.   
   try {
-    const { _id } = req.params;
-    const updateData = req.body; // Esto contiene los datos enviados desde Postman
+    const { _id } = req.params
+    const updateData = req.body // Esto contiene los datos enviados desde Postman
 
-    const updatedCart = await CartMongo.findByIdAndUpdate(_id, updateData, { new: true });
+    const updatedCart = await CartMongo.findByIdAndUpdate(_id, updateData, { new: true })
 
     if (!updatedCart) {
-      return res.status(404).json({ error: 'Carrito no encontrado' });
+      return res.status(404).json({ error: 'Carrito no encontrado' })
     }
 
     return res.json({ status: 'success', updatedCart });
@@ -154,8 +141,6 @@ router.put('/cart/:_id', async (req, res) => {   // este endpoint lo deje para t
   }
 })
 
-
-
 //este endpoint lo utilizo en  => Mostrar carrito => abrir carrito => Mostrar detalle => en esta vista podes cambiar la cantidad con el boton + o el boton - y lo va actualizando.
 router.put('/cart/:_id/products/:pid', async (req, res) => {
   try {
@@ -166,8 +151,8 @@ router.put('/cart/:_id/products/:pid', async (req, res) => {
     
     return res.json({ status: "success" })
   } catch (error) {
-    console.error('Error al actualizar el producto del carrito', error);
-    res.status(500).json({ error: 'Error interno del servidor' });
+    console.error('Error al actualizar el producto del carrito', error)
+    res.status(500).json({ error: 'Error interno del servidor' })
   }
 })
 

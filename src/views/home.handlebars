@@ -11,7 +11,7 @@
 </div>
 
 <div>
-     {{#if result.Productos}}
+    {{#if result.Productos}}
     <h1> Productos de base da datos Mongo </h1>
     {{#each result.Productos}}
     <hr>
@@ -67,7 +67,7 @@
     <a id="btnPrev" href="#" {{#unless result.hasPrevPage}} style="display: none" {{/unless}}> Anterior </a>
     <a id="btnNext" href="#" {{#unless result.hasNextPage}} style="display: none" {{/unless}}> Siguiente </a><br>
 
- {{/if}}
+    {{/if}}
 </div>
 
 
@@ -77,15 +77,14 @@
     deleteButtons.forEach(button => {
         button.onclick = e => {
             const id = button.dataset.productId;
-
             fetch(`/productos/${id}`, { method: 'delete' })
                 .then(() => {
                     alert('Eliminado con éxito' + id);
-                    document.location.href = '/productos';
+                    document.location.href = '/productos'
                     console.log(id);
                 })
                 .catch(e => {
-                    alert('No se puede eliminar el producto');
+                    alert('No se puede eliminar el producto')
                 });
         };
     });
@@ -98,11 +97,11 @@
             const id = button.dataset.cartId;
             fetch(`/productos/${id}`, { method: 'post' })
                 .then(() => {
-                    alert('Se agrego el producto' + id + " al carrito");
-                    document.location.href = '/productos';
+                    alert('Se agrego el producto' + id + " al carrito")
+                    document.location.href = '/productos'
                 })
                 .catch(e => {
-                    alert(e);
+                    alert(e)
                 });
         };
     });
@@ -113,12 +112,10 @@
         const query = document.querySelector('#query').value
         const sortField = document.querySelector('#sortField').value
         const sortOrder = document.querySelector('#sortOrder').value
-        const category = document.querySelector('#category').value;
-        const stockOnly = document.querySelector('#stockOnly').checked;
+        const category = document.querySelector('#category').value
+        const stockOnly = document.querySelector('#stockOnly').checked
 
-        //let url = `http://localhost:8080/productos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
-        let url = `http://localhost:8080/productos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
-        
+        let url = `http://localhost:8080/productos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
         if (category) {
             url += `&category=${category}`
@@ -135,13 +132,12 @@
         const nextPage = document.querySelector('#nextPage').value
         const limit = document.querySelector('#limit').value
         const query = document.querySelector('#query').value
-        const sortField = document.querySelector('#sortField').value;
-        const sortOrder = document.querySelector('#sortOrder').value;
-        const category = document.querySelector('#category').value;
-        const stockOnly = document.querySelector('#stockOnly').checked;
+        const sortField = document.querySelector('#sortField').value
+        const sortOrder = document.querySelector('#sortOrder').value
+        const category = document.querySelector('#category').value
+        const stockOnly = document.querySelector('#stockOnly').checked
 
-        //let url = `http://localhost:8080/productos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
-         let url = `http://localhost:8080/productos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
+        let url = `http://localhost:8080/productos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
 
         if (category) {
             url += `&category=${category}`
@@ -163,7 +159,6 @@
         const category = document.querySelector('#category').value;
         const stockOnly = document.querySelector('#stockOnly').checked;
 
-        console.log(category)    
         let url = `http://localhost:8080/productos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
         if (category) {

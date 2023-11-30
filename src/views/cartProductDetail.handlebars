@@ -1,24 +1,25 @@
-<div>   
-     {{#if producto}}
+<div>
 
-        <input id="idCarrito" type="hidden" value="{{producto._id}}">
-        <ul>
-            <hr>
-            <li><span>Producto: {{producto.title}}</span></li>
-            <li><span>Precio: {{producto.price}}</span></li>
-            <li><span>Categoria: {{producto.category}}</span></li><br><br>
-            <li>
-                <button id="restar" data-subtract-num="{{producto.pid}}">-</button>
-                <span id="quantity" data-value="{{producto.quantity}}"> Cantidad: {{producto.quantity}}</span>
-                <button id="sumar" data-add-num="{{producto.pid}}">+</button>
-            </li>
-            <hr>
-        </ul>
-    {{/if}}  
+    {{#if producto}}
+    <input id="idCarrito" type="hidden" value="{{producto._id}}">
+    <ul>
+        <hr>
+        <li><span>Producto: {{producto.title}}</span></li>
+        <li><span>Precio: {{producto.price}}</span></li>
+        <li><span>Categoria: {{producto.category}}</span></li><br><br>
+        <li>
+            <button id="restar" data-subtract-num="{{producto.pid}}">-</button>
+            <span id="quantity" data-value="{{producto.quantity}}"> Cantidad: {{producto.quantity}}</span>
+            <button id="sumar" data-add-num="{{producto.pid}}">+</button>
+        </li>
+        <hr>
+    </ul>
+    {{/if}}
+
 </div>
 <script>
 
-     const sumar = document.querySelectorAll('#sumar')
+    const sumar = document.querySelectorAll('#sumar')
     sumar.forEach(button => {
         button.onclick = e => {
 
@@ -27,43 +28,43 @@
             console.log(pid + idcart)
             fetch(`/productos/cart/${idcart}/products/${pid}?operacion=sumar`, { method: 'put' })
                 .then(() => {
-                    document.location.href = `/productos/cart/${idcart}/products/${pid}`;
+                    document.location.href = `/productos/cart/${idcart}/products/${pid}`
                 })
                 .catch(e => {
-                    alert('No se puede modificar el producto');
-                });
+                    alert('No se puede modificar el producto')
+                })
         }
     })
+
     const restar = document.querySelectorAll('#restar')
     restar.forEach(button => {
         button.onclick = e => {
             const cantidadSpan = document.querySelector('#quantity');
-            const cantidad =  parseInt(cantidadSpan.getAttribute('data-value'), 10);
+            const cantidad = parseInt(cantidadSpan.getAttribute('data-value'), 10)
             const pid = button.dataset.subtractNum
             const idcart = document.querySelector('#idCarrito').value
             console.log(pid + idcart + cantidad)
-            if(cantidad > 1){
+            if (cantidad > 1) {
                 console.log("entro a cantidad mayor a 1")
                 fetch(`/productos/cart/${idcart}/products/${pid}?operacion=restar`, { method: 'put' })
-                .then(() => {
-                    console.log("producto actualizado")
-                    document.location.href = `/productos/cart/${idcart}/products/${pid}`
-                })
-                .catch(e => {
-                    alert('No se puede modificar el producto');
-                });
+                    .then(() => {
+                        console.log("producto actualizado")
+                        document.location.href = `/productos/cart/${idcart}/products/${pid}`
+                    })
+                    .catch(e => {
+                        alert('No se puede modificar el producto')
+                    });
             }
-            else{
-                // fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
-                //.then(() => {
-                    console.log("cuando llega a cero deberia eliminar el producto pero estoy teniendo problemas con esta linea")
-                  //  document.location.href = `/productos/cart/${idcart}/products/${pid}`;
-               // })
-               // .catch(e => {
-               //     alert('No se puede modificar el producto');
-               // });
+            else {
+                fetch(`/productos/cart/${idcart}/products/${pid}`, { method: 'delete' })
+                    .then(() => {
+                        document.location.href = `/productos/cart/${idcart}/products/${pid}`
+                    })
+                    .catch(e => {
+                        alert('No se puede modificar el producto');
+                    })
             }
-            
+
         }
     }) 
 </script>

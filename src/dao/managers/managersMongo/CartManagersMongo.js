@@ -34,22 +34,21 @@ class CardManagersMongo {
                 };
             });
         } catch (error) {
-            console.error('Error al obtener carritos:', error);
+            console.error('Error al obtener carritos:', error)
             throw error; // Propaga el error para manejarlo en el router
         }
     }
 
-
     createCart = async (productId) => {
         try {
-            console.log("try", productId)
+             
             //primera busqueda verifico si existe un carrito que cumpla con las dos condicion es decir que pid exista y finalizado sea = a false
-            let activeCart = await CartMongo.findOne({ 'productos.pid': productId, finalizado: false });
+            let activeCart = await CartMongo.findOne({ 'productos.pid': productId, finalizado: false })
 
             if (!activeCart) {
 
                 //Si no cumple con las dos verifico que por lo menos finalizado sea = false
-                activeCart = await CartMongo.findOne({ finalizado: false });
+                activeCart = await CartMongo.findOne({ finalizado: false })
 
                 if (activeCart) {       //si cumple con esto quiere decir que el carrtio todavia no tiene el producto lo agrego
                     activeCart.productos.push({
@@ -58,12 +57,12 @@ class CardManagersMongo {
                     });
 
                     // Guarda el carrito actualizado
-                    const updatedCart = await activeCart.save();
+                    const updatedCart = await activeCart.save()
                     return updatedCart;
                 }
             } else { // Si el producto esta en el carrito y el carrito esta abierto le aumento la cantidad 
 
-                const existingProduct = activeCart.productos.find(producto => producto.pid.equals(productId));
+                const existingProduct = activeCart.productos.find(producto => producto.pid.equals(productId))
 
                 if (existingProduct) {
                     // El producto existe, actualiza la cantidad utilizando updateOne
@@ -73,8 +72,8 @@ class CardManagersMongo {
                     );
 
                     // Obtén el carrito actualizado después de la actualización
-                    const updatedCart = await CartMongo.findById(activeCart._id);
-                    return updatedCart;
+                    const updatedCart = await CartMongo.findById(activeCart._id)
+                    return updatedCart
                 }
 
             }
@@ -90,12 +89,12 @@ class CardManagersMongo {
             });
 
             // Guarda el nuevo carrito en la base de datos
-            const savedCart = await newCart.save();
-            return savedCart;
+            const savedCart = await newCart.save()
+            return savedCart
 
         } catch (error) {
             console.log("catch", productId)
-            console.error('Error al crear o actualizar el carrito:', error);
+            console.error('Error al crear o actualizar el carrito:', error)
             throw error; // Propaga el error para manejarlo en el router
         }
     }
@@ -143,27 +142,27 @@ class CardManagersMongo {
 
             if (!cart) {
                 // Si no se encuentra el carrito, puedes manejar el error de alguna manera
-                throw new Error('Carrito no encontrado');
+                throw new Error('Carrito no encontrado')
             }
 
             // Devuelve el detalle del carrito
-            return cart;
+            return cart
         } catch (error) {
             // Maneja cualquier error que ocurra durante la operación
-            console.error('Error al obtener el detalle del carrito', error);
-            throw new Error('Error interno del servidor');
+            console.error('Error al obtener el detalle del carrito', error)
+            throw new Error('Error interno del servidor')
         }
     }
 
     updateCantCart = async (cid, pid, operacion) => {
         try {
-            const cart = await CartMongo.findById(cid);
+            const cart = await CartMongo.findById(cid)
 
             if (!cart) {
-                throw new Error('Carrito no encontrado');
+                throw new Error('Carrito no encontrado')
             }
 
-            const productoEnCarrito = cart.productos.find(producto => producto.pid.equals(pid));
+            const productoEnCarrito = cart.productos.find(producto => producto.pid.equals(pid))
 
             if (!productoEnCarrito) {
                 throw new Error('Producto no encontrado en el carrito');
@@ -175,40 +174,40 @@ class CardManagersMongo {
                 if (productoEnCarrito.quantity > 1) {
                     productoEnCarrito.quantity -= 1;
                 } else {
-                    throw new Error('La cantidad mínima permitida es 1');
+                    throw new Error('La cantidad mínima permitida es 1')
                 }
             } else {
-                throw new Error('Operación no válida');
+                throw new Error('Operación no válida')
             }
 
-            await cart.save();
+            await cart.save()
 
             return;
         } catch (error) {
-            console.error('Error al actualizar la cantidad del producto en el carrito', error);
-            throw error;
+            console.error('Error al actualizar la cantidad del producto en el carrito', error)
+            throw error
         }
     }
 
     getCartDetailProduct = async (cid, pid) => {
         try {
-            const cart = await CartMongo.findOne({ _id: cid }).populate('productos.pid');
-    
+            const cart = await CartMongo.findOne({ _id: cid }).populate('productos.pid')
+
             if (!cart) {
                 throw new Error('Carrito no encontrado');
             }
-    
+
             const productoEnCarrito = cart.productos.find(producto => producto.pid.equals(pid))
 
             if (!productoEnCarrito) {
-                throw new Error('Producto no encontrado en el carrito');
+                throw new Error('Producto no encontrado en el carrito')
             }
-    
+
             return productoEnCarrito
-             
+
         } catch (error) {
-            console.error('Error al obtener el detalle del producto en el carrito', error);
-            throw error;
+            console.error('Error al obtener el detalle del producto en el carrito', error)
+            throw error
         }
     }
 }

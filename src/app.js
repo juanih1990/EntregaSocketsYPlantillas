@@ -15,8 +15,6 @@ const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
-
-
 //mongoose
 const mongoURL = 'mongodb+srv://juanih1990:963258527415963@clustercursobackend.ddoeaet.mongodb.net/'
 const mongoDBName = 'productos'
@@ -24,12 +22,6 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 
 
-
-
-
-
-
-  
 app.engine('handlebars', handlebars.engine())
 //seteo las vistas 
 app.set('views', __dirname + '/views')
@@ -49,31 +41,24 @@ app.use('/api/carts', routerCart)
 app.get('/realTimeProducts', viewsRouter)
 
 
-
-
 //conexion mongo
 const httpServer = app.listen(8080, () => {
-    console.log('Listening Go');
-mongoose.connect(mongoURL, { dbName: mongoDBName })
-    .then(() => {
-        console.log('DB conectada ...')
-      
-        //Chat
-        const io = new Server(httpServer)
+    console.log('Listening Go')
+    mongoose.connect(mongoURL, { dbName: mongoDBName })
+        .then(() => {
+            console.log('DB conectada ...')
+            //Chat
+            const io = new Server(httpServer)
+            const messages = []
+            io.on('connection', socket => {
+                console.log('new socket')
 
-        const messages = []
-
-        io.on('connection', socket => {
-            console.log('new socket')
-
-            socket.on('message', data => {
-                messages.push(data)
-                console.log(data)
-                io.emit('logs', messages)
+                socket.on('message', data => {
+                    messages.push(data)
+                    console.log(data)
+                    io.emit('logs', messages)
+                })
             })
-
         })
-        //
-    })
-    .catch((e) => console.log('Error al intentar conectar a la DB'))
+        .catch((e) => console.log('Error al intentar conectar a la DB'))
 })
