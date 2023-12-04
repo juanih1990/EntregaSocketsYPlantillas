@@ -4,11 +4,14 @@ import routerCart from './router/cart.router.js'
 import handlebars from 'express-handlebars'
 import __dirname from './util.js'
 import viewsRouter from './router/view.router.js'
+import sessionRouter from './router/session.router.js'
 import { Server, Socket } from 'socket.io'
 import mongoose from "mongoose";
 import ProductsMongo from "./router/productsMongo.router.js"
 import CartMongo from "./router/cartMongo.router.js"
 import chatMongo from "./router/chatMongo.router.js"
+import session from 'express-session'
+import mongoStore from 'connect-mongo'
 
 //import routerCarts from './router/carts.router.js'
 const app = express()
@@ -31,11 +34,52 @@ app.set('view engine', 'handlebars')
 
 app.use('/static', express.static(__dirname + '/public'))
 
-//filesystem
-app.get('/', viewsRouter)
-app.use('/productos/chat', chatMongo)
-app.use('/productos', ProductsMongo)
-app.use('/productos', CartMongo)
+
+//Session
+app.use(session ({
+    store: mongoStore.create({
+        mongoUrl: mongoURL,
+        dbName: mongoDBName
+    }),
+    secret: 'secret',
+    resave: true,
+    saveUninitialized: true
+  }))
+  
+
+// Middleware para usuarios normales
+function normalUserAuth(req, res, next) {
+    if (req.session?.user) {
+        console.log("usuario normal");
+        return next();
+    } else {
+        res.status(401);
+        return res.render('errorSession',  {});
+    }
+}
+
+// Middleware para administradores
+function adminAuth(req, res, next) {
+    if (req.session?.user.email === 'admin@gmail.com' && req.session?.user.password === 'admin1234') {
+        console.log("entro al admin");
+        return next();
+    } else {
+        res.status(401);
+        return res.render('errorSession', {});
+    }
+}
+
+
+app.get('/', sessionRouter)
+app.get('/login', sessionRouter)
+app.get('/login/registerView', sessionRouter)
+app.post('/login/users', sessionRouter)
+app.post('/login/register', sessionRouter)
+app.get('/logout', sessionRouter)
+app.use('/productos/chat', adminAuth, chatMongo)
+app.use('/ListarProductos', normalUserAuth, ProductsMongo)
+app.use('/productos', normalUserAuth, ProductsMongo)
+app.use('/productos', normalUserAuth, CartMongo)
 app.use('/api/products', routerProducts)
 app.use('/api/carts', routerCart)
 app.get('/realTimeProducts', viewsRouter)

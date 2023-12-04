@@ -1,9 +1,16 @@
 import { Router } from 'express'
 import CartManagerMongo from '../dao/managers/managersMongo/CartManagersMongo.js'
 import CartModel from '../dao/models/cart.model.js'
+import session from 'express-session'
 
 const router = Router()
 const cartManagerMongo = new CartManagerMongo()
+
+function sessionOpen(req, res, next) {
+  res.locals.session = req.session;
+  next();
+}
+
 
 router.delete('/cart/:_id', async (req, res) => {
   try {
@@ -37,7 +44,7 @@ router.post('/:pid', async (req, res) => {
   }
 })
 
-router.get('/cart', async (req, res) => {
+router.get('/cart', sessionOpen ,async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -72,13 +79,13 @@ router.get('/cart', async (req, res) => {
   res.render('cart', { result })
 })
 
-router.get('/cart/:_id', async (req, res) => {
+router.get('/cart/:_id', sessionOpen , async (req, res) => {
     const { _id } = req.params;
     const result = await cartManagerMongo.getCart(_id)
     res.render('cartDetail', { result });
 });
 
-router.get('/cart/:_id/products/:pid' , async(req,res) =>{
+router.get('/cart/:_id/products/:pid' , sessionOpen , async(req,res) =>{
   const { _id , pid } = req.params;
   
   const result = await cartManagerMongo.getCartDetailProduct(_id,pid)

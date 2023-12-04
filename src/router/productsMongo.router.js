@@ -2,10 +2,18 @@ import { Router } from 'express'
 import ProductsModel from '../dao/models/products.model.js'
 import ProductManagerMongo from "../dao/managers/managersMongo/ProductManagersMongo.js"
 import ProductsMongo from '../dao/models/products.model.js'
+import session from 'express-session'
+
 
 const router = Router()
 const productManagerMongo = new ProductManagerMongo()
 
+
+function sessionOpen(req, res, next) {
+  res.locals.session = req.session;
+  res.locals.isAdmin = req.session?.user?.email === 'admin@gmail.com' && req.session?.user?.password === 'admin1234'
+  next();
+}
 
 router.post('/', (req, res) => {
   try {
@@ -17,7 +25,7 @@ router.post('/', (req, res) => {
   }
 })
 
-router.get('/', async (req, res) => {
+router.get('/listarProductos', sessionOpen , async (req, res) => {
   //aca voy a hacer la paginacion
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
@@ -29,7 +37,7 @@ router.get('/', async (req, res) => {
 
 
   const search = {}
-  console.log("categoria: " + category)
+
   if (category) {
     search.category = category
   }
@@ -54,8 +62,14 @@ router.get('/', async (req, res) => {
   res.render('home', { result })
 })
 
-router.get("/nuevoProducto", async (req, res) => {
-  res.render('create', {})
+router.get("/nuevoProducto", sessionOpen ,   async (req, res) => {
+  if (!res.locals.isAdmin) {
+    const admin = true
+    return res.render('errorSession' , { admin } ) 
+  }
+  else{
+    res.render('create', {})
+  }
 })
 
 router.delete("/:id", async (req, res) => {

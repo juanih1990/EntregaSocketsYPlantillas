@@ -1,0 +1,10 @@
+<div>
+    {{#if admin}}
+    {{admin}}
+    <h1>No tienens los permisos para poder agregar productos, vuelve a loguear como administrador</h1>
+    <a href="/"> Loguin </a>
+    {{else}}
+ <h1>No tienes credenciales para ver esta pagina. Intenta loguear.</h1>
+    <a href="/"> Loguin </a>
+    {{/if}}
+</div>
