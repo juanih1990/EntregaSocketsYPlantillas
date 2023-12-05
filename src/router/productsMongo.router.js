@@ -17,16 +17,16 @@ function sessionOpen(req, res, next) {
 
 router.post('/', (req, res) => {
   try {
+    console.log("entro a agregar")
     const newProduct = req.body
     productManagerMongo.AgregarProductos(newProduct)
-    res.redirect('/productos')
+    res.redirect('/productos/listarProductos')
   } catch (error) {
     res.send('Error al crear el producto' + error)
   }
 })
 
-router.get('/listarProductos', sessionOpen , async (req, res) => {
-  //aca voy a hacer la paginacion
+router.get('/listarProductos',  async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -58,8 +58,8 @@ router.get('/listarProductos', sessionOpen , async (req, res) => {
   result.Productos = result.docs
   result.query = ""
   delete result.docs
-
-  res.render('home', { result })
+  console.log(result.Productos)
+  res.render('home', { result , session: req.session  })
 })
 
 router.get("/nuevoProducto", sessionOpen ,   async (req, res) => {

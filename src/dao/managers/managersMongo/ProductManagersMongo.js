@@ -8,9 +8,10 @@ class ProductManagerMongo {
         return this.products
     }
     AgregarProductos = async (body) => {
-        this.products = await ProductsModel.find().lean().exec()  // Primero traigo mis productos de la base de datos para comparar codigo , y asi verificar si existe. ademas de validar datos
+        this.products = await ProductsModel.find().lean().exec()  // Primero traigo mis productos de la base de datos para comparar codigo 
+                                                                    //, y asi verificar si existe. ademas de validar datos
         let existencia
-
+        
         if (
             !body.title ||
             !body.price ||

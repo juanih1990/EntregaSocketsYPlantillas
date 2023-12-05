@@ -1,9 +1,37 @@
-<h1>Ingresa tus datos: </h1>
-    <form action="/login/register" method="post">
+<form class="container mt-4 " action="/login/register" method="post">
+    <div class="mb-3">
+        <label for="Nombre" class="form-label">Nombre</label>
+        <input type="text" class="form-control" id="firest_name" name="firest_name">
+    </div>
+    <div class="mb-3">
+        <label for="Apellido" class="form-label">Apellido</label>
+        <input type="text" class="form-control" id="last_name" name="last_name">
+    </div>
+    <div class="mb-3">
+        <label for="Edad" class="form-label">Edad</label>
+        <input type="text" class="form-control" id="age_name" name="age_name">
+    </div>
+    <div class="mb-3">
+        <label for="Email" class="form-label">Email</label>
+        <input type="email" class="form-control" id="email" name="email">
+    </div>
+    <div class="mb-3">
+        <label for="Password" class="form-label">Password</label>
+        <input type="password" class="form-control" id="password" name="password">
+    </div>
+    <div class="text-center">
+        <button type="submit" class="btn btn-primary">Registrar</button>
+    </div>
+</form>
+
+
+
+{{!-- <h1>Ingresa tus datos: </h1>
+<form action="/login/register" method="post">
     <input type="text" name="firest_name" id=""><br>
     <input type="text" name="last_name" id=""><br>
     <input type="number" name="age_name" id=""><br>
     <input type="email" name="email" id=""><br>
     <input type="password" name="password" id=""><br>
     <button type="submit">Registrar</button>
-    </form>
+</form> --}}

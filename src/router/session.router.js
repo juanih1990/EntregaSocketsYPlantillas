@@ -24,10 +24,9 @@ router.get('/login/registerView', (req, res) => {
 router.post('/login/users', async (req, res) => {
     try {
         const { email, password } = req.body
-        console.log("Estoy en el login :" + email + " " + password )
         if(email === 'admin@gmail.com' && password === 'admin1234'){
             req.session.user = { email: 'admin@gmail.com', password: 'admin1234' };
-            return res.redirect('/');   
+            return res.redirect('/productos/listarProductos');   
          }
 
 
@@ -35,9 +34,10 @@ router.post('/login/users', async (req, res) => {
         if (!user) {
             return res.status(401).send('Invalid username or password');
         }
-    
-        req.session.user = user
-        res.redirect('/');
+        else{
+            req.session.user = user
+            return  res.redirect('/productos/listarProductos');
+        }
     } catch (error) {
         console.error('Error during login:', error);
         res.status(500).send('Internal Server Error');
@@ -60,6 +60,7 @@ router.get('/logout', (req, res) => {
             console.error('Error al destruir la sesión:', err);
             return res.status(500).send('Error al cerrar sesión')
         }
+
         res.redirect('/')
     })
 })

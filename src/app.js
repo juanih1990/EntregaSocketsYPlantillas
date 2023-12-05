@@ -48,7 +48,7 @@ app.use(session ({
   
 
 // Middleware para usuarios normales
-function normalUserAuth(req, res, next) {
+function Auth(req, res, next) {
     if (req.session?.user) {
         console.log("usuario normal");
         return next();
@@ -58,31 +58,10 @@ function normalUserAuth(req, res, next) {
     }
 }
 
-// Middleware para administradores
-function adminAuth(req, res, next) {
-    if (req.session?.user.email === 'admin@gmail.com' && req.session?.user.password === 'admin1234') {
-        console.log("entro al admin");
-        return next();
-    } else {
-        res.status(401);
-        return res.render('errorSession', {});
-    }
-}
-
-
-app.get('/', sessionRouter)
-app.get('/login', sessionRouter)
-app.get('/login/registerView', sessionRouter)
-app.post('/login/users', sessionRouter)
-app.post('/login/register', sessionRouter)
-app.get('/logout', sessionRouter)
-app.use('/productos/chat', adminAuth, chatMongo)
-app.use('/ListarProductos', normalUserAuth, ProductsMongo)
-app.use('/productos', normalUserAuth, ProductsMongo)
-app.use('/productos', normalUserAuth, CartMongo)
-app.use('/api/products', routerProducts)
-app.use('/api/carts', routerCart)
-app.get('/realTimeProducts', viewsRouter)
+app.use('/' , sessionRouter )
+app.use('/productos' , Auth, ProductsMongo) 
+app.use('/productos' , Auth, chatMongo) 
+app.use('/productos' , Auth, CartMongo) 
 
 
 //conexion mongo

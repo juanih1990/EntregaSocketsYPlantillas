@@ -1,16 +1,16 @@
 <div>
     <h1> Carrito </h1>
-    {{#if result.cartItem}}
+    {{#if result.cartItem}} 
  
-       {{#each result.cartItem}}
+       {{#each result.cartItem}}     
  
 
-      {{#if this.productos.[0].pid}}
+      {{#if this.productos.[0].pid}}  
             <hr>
             <h2>Numero de compra ( id: {{this._id}} ) estado: {{#unless this.finalizado}} En proceso {{else}} Cerrado{{/unless}}
             </h2>
             <button id="deleteCart" data-delete-Cartid="{{this._id}}">Borrar Carrito</button>
-            <button id="openCart" data-open-cartid="{{this._id}}">Abrir Carrito</button>
+            <button id="openCart" data-open-cartid="{{this._id}}">Abrir Carrito</button> 
             <hr>
               {{else}}
             <p>El carrito está vacío. ¡Comienza a comprar!</p>

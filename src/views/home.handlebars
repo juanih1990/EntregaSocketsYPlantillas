@@ -12,7 +12,7 @@
 
 <div>
     {{#if result.Productos}}
-    <h1> Productos de base da datos Mongo </h1>
+    <h1> Productos: </h1>
     {{#each result.Productos}}
     <hr>
     <ul>
@@ -80,8 +80,7 @@
             fetch(`/productos/${id}`, { method: 'delete' })
                 .then(() => {
                     alert('Eliminado con éxito' + id);
-                    document.location.href = '/productos'
-                    console.log(id);
+                    document.location.href = '/productos/listarProductos'
                 })
                 .catch(e => {
                     alert('No se puede eliminar el producto')
@@ -98,7 +97,7 @@
             fetch(`/productos/${id}`, { method: 'post' })
                 .then(() => {
                     alert('Se agrego el producto' + id + " al carrito")
-                    document.location.href = '/productos'
+                    document.location.href = '/productos/listarProductos'
                 })
                 .catch(e => {
                     alert(e)

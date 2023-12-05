@@ -38,7 +38,7 @@ router.post('/:pid', async (req, res) => {
   try {
     const { pid } = req.params
     await cartManagerMongo.createCart(pid)
-    res.redirect('/productos')
+    res.redirect('/productos/listarProductos')
   } catch (error) {
     res.send('Error al agregar el producto al carrito' + error)
   }

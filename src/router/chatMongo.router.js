@@ -5,9 +5,9 @@ const router = express.Router()
 
 const chatmanagersMongo = new chatManagersMongo()
 
-router.get('/' ,async(req,res) => {  
+router.get('/chat' ,async(req,res) => {  
     const chats =  await chatmanagersMongo.getChats()
-    res.render('chat', {chats})
+    res.render('chat', {chats , session: req.session})
 })
 
 router.post('/',  (req, res) => {
