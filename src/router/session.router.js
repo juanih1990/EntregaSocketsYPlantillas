@@ -6,11 +6,12 @@ import sessionModel from '../dao/models/session.model.js'
 
 const router = Router();
 
+/*
 router.use(session({
     secret: 'secret',
     resave: true,
     saveUninitialized: true
-}))
+}))*/
 
 router.get('/', (req, res) => {
     console.log(req.session)

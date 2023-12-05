@@ -1,9 +1,6 @@
 import express from 'express'
-import routerProducts from './router/products.router.js'
-import routerCart from './router/cart.router.js'
 import handlebars from 'express-handlebars'
 import __dirname from './util.js'
-import viewsRouter from './router/view.router.js'
 import sessionRouter from './router/session.router.js'
 import { Server, Socket } from 'socket.io'
 import mongoose from "mongoose";
@@ -13,7 +10,6 @@ import chatMongo from "./router/chatMongo.router.js"
 import session from 'express-session'
 import mongoStore from 'connect-mongo'
 
-//import routerCarts from './router/carts.router.js'
 const app = express()
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -39,7 +35,8 @@ app.use('/static', express.static(__dirname + '/public'))
 app.use(session ({
     store: mongoStore.create({
         mongoUrl: mongoURL,
-        dbName: mongoDBName
+        dbName: mongoDBName,
+        ttl: 100
     }),
     secret: 'secret',
     resave: true,
