@@ -13,6 +13,7 @@ router.use(session({
 }))
 
 router.get('/', (req, res) => {
+    console.log(req.session)
     res.render("login", { session: req.session })
 })
 
@@ -24,6 +25,7 @@ router.get('/login/registerView', (req, res) => {
 router.post('/login/users', async (req, res) => {
     try {
         const { email, password } = req.body
+       // console.log('Datos del formulario:', email, password);
         if(email === 'admin@gmail.com' && password === 'admin1234'){
             req.session.user = { email: 'admin@gmail.com', password: 'admin1234' };
             return res.redirect('/productos/listarProductos');   
@@ -31,18 +33,20 @@ router.post('/login/users', async (req, res) => {
 
 
         const user = await sessionModel.findOne({ email, password })
+       // console.log('Usuario encontrado en la base de datos:', user);
+       
         if (!user) {
             return res.status(401).send('Invalid username or password');
         }
         else{
             req.session.user = user
+           // console.log('Usuario autenticado:', req.session.user);
             return  res.redirect('/productos/listarProductos');
         }
     } catch (error) {
         console.error('Error during login:', error);
-        res.status(500).send('Internal Server Error');
+        res.status(500).send(`IInternal Server Error ${error.message}`);
     }
-
 })
 
 router.post('/login/register', async (req, res) => {

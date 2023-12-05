@@ -14,20 +14,22 @@
 <body>
     <nav class="navbar navbar-expand-lg bg-body-tertiary">
         <div class="container-fluid">
-            {{#if session.user}}
+            {{#if admin }}
             <a class="navbar-brand" href="/productos/nuevoProducto">Agregar Productos</a>
-             {{else}}
+            {{/if}}
+             
+              {{#unless session.user }}
               <a class="navbar-brand" href="/">Login</a>
-              {{/if}}
+              {{/unless}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
                 aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                 <div class="navbar-nav">
-                    <a class="nav-link active" aria-current="page" href="/productos/listarProductos">Listar Productos</a>
-                    <a class="nav-link" href="/productos/cart">Mostrar Carrito</a>
-                    <a class="nav-link" href="/productos/chat">CHAT</a>
+                    <a class="nav-link active" aria-current="page" href="/productos/listarProductos">Productos</a>
+                    <a class="nav-link" href="/productos/cart">Carrito</a>
+                    <a class="nav-link" href="/productos/chat">Chat</a>
                     {{#if session.user}}
                     <a class="nav-link" aria-disabled="true" href="/logout">logout</a>
                      {{/if}}
@@ -36,17 +38,6 @@
         </div>
     </nav>
     <nav>
-        {{!-- <li><a href="/">Listar Productos desde FyleSystem</a></li> 
-        {{#if session.user}}
-        <li><a href="/logout">Logout</a></li>
-        <li><a href="/productos/nuevoProducto">Agregar Productos</a></li>
-        {{else}}
-        <li><a href="/">Login</a></li>
-        {{/if}}
-        <li><a href="/productos/ListarProductos">Listar Productos desde mongo</a></li>
-        <li><a href="/productos/cart">Mostrar Carrito</a></li>
-        <li><a href="/productos/chat">CHAT</a></li>
-    </nav>--}}
     {{{body}}}
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"

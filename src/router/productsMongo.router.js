@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
   }
 })
 
-router.get('/listarProductos',  async (req, res) => {
+router.get('/listarProductos', sessionOpen ,  async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -35,6 +35,7 @@ router.get('/listarProductos',  async (req, res) => {
   const category = req.query?.category || ''
   const stockOnly = req.query?.stockOnly === 'true'
 
+  
 
   const search = {}
 
@@ -58,17 +59,16 @@ router.get('/listarProductos',  async (req, res) => {
   result.Productos = result.docs
   result.query = ""
   delete result.docs
-  console.log(result.Productos)
-  res.render('home', { result , session: req.session  })
+  res.render('home', { result , session: req.session  , admin: res.locals.isAdmin })
 })
 
 router.get("/nuevoProducto", sessionOpen ,   async (req, res) => {
-  if (!res.locals.isAdmin) {
-    const admin = true
-    return res.render('errorSession' , { admin } ) 
+
+  if(res.locals.isAdmin){
+    res.render('create', {admin: res.locals.isAdmin})
   }
   else{
-    res.render('create', {})
+    return res.render('errorSession' , { admin } ) 
   }
 })
 

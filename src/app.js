@@ -50,7 +50,6 @@ app.use(session ({
 // Middleware para usuarios normales
 function Auth(req, res, next) {
     if (req.session?.user) {
-        console.log("usuario normal");
         return next();
     } else {
         res.status(401);
