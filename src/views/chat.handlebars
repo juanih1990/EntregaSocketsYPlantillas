@@ -1,14 +1,17 @@
 <h1>Chat de lol: </h1>
-<div>
-    <i id="username"></i><input type="text" id="chatinput"><button id="send">Enviar</button>
-</div>
+<div >
+    <div class="m-3">
+        <i id="username"></i><input type="text" id="chatinput"><button id="send">Enviar</button>
+    </div>
 
-<div id="chatbox">
-   {{#each chats.messages}}
-   <br>
-   <br>
-    {{this.text}}
-    {{/each}}
+
+    <div id="chatbox" class="m-4" >
+        {{#each chats.messages}}
+        <br>
+        <br>
+        {{this.text}}
+        {{/each}}
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script src="/socket.io/socket.io.js"></script>

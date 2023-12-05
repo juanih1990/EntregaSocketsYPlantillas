@@ -8,6 +8,7 @@ const cartManagerMongo = new CartManagerMongo()
 
 function sessionOpen(req, res, next) {
   res.locals.session = req.session;
+  res.locals.isAdmin = req.session?.user?.email === 'admin@gmail.com' && req.session?.user?.password === 'admin1234'
   next();
 }
 
@@ -76,7 +77,7 @@ router.get('/cart', sessionOpen ,async (req, res) => {
   result.query = ""
   delete result.docs
 
-  res.render('cart', { result })
+  res.render('cart', { result  , admin: res.locals.isAdmin})
 })
 
 router.get('/cart/:_id', sessionOpen , async (req, res) => {

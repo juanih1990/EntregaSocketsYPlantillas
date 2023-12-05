@@ -5,9 +5,15 @@ const router = express.Router()
 
 const chatmanagersMongo = new chatManagersMongo()
 
-router.get('/chat' ,async(req,res) => {  
+function sessionOpen(req, res, next) {
+    res.locals.session = req.session;
+    res.locals.isAdmin = req.session?.user?.email === 'admin@gmail.com' && req.session?.user?.password === 'admin1234'
+    next();
+  }
+
+router.get('/chat', sessionOpen ,async(req,res) => {  
     const chats =  await chatmanagersMongo.getChats()
-    res.render('chat', {chats , session: req.session})
+    res.render('chat', {chats , session: req.session ,  admin: res.locals.isAdmin})
 })
 
 router.post('/',  (req, res) => {
