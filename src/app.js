@@ -38,7 +38,7 @@ app.use(session ({
     store: mongoStore.create({
         mongoUrl: mongoURL,
         dbName: mongoDBName,
-        ttl: 100
+        ttl: 86400  //un dia
     }),
     secret: 'secret',
     resave: true,

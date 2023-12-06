@@ -11,8 +11,24 @@
 </div> --}}
 
 <div>
+
     {{#if result.Productos}}
-    <h1> Productos: </h1>
+     <div class="d-flex flex-wrap justify-content-center ">   
+    {{#each result.Productos}}
+   
+        <div class="card m-4 " style="width: 18rem; height: auto">
+            <img src="{{this.thumbnail}}" class="card-img-top img-fluid container"  style=" height: 265px" alt="...">
+            <div class="card-body">
+                <h5 class="card-title"> {{this.title}}</h5>
+                <p class="card-text">{{this.description}}</p>
+                <button class="btn btn-danger delete" data-product-id="{{this._id}}">Delete</button>
+                <button class="btn btn-primary add" data-cart-id="{{this._id}}">Agregar al carrito</button>
+            </div>
+        </div>
+   
+    {{/each}}
+     </div>
+    {{!--
     {{#each result.Productos}}
     <hr>
     <ul>
@@ -24,7 +40,7 @@
         <button class="add" data-cart-id="{{this._id}}">Agregar al carrito</button>
     </ul>
     <hr>
-    {{/each}}
+    {{/each}} --}}
 
     <span>Total Products:</span> {{ result.totalDocs }} <br>
     <span>pages:</span> {{ result.page }} / {{ result.totalPages }} <br>
