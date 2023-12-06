@@ -26,7 +26,7 @@ router.post('/', (req, res) => {
   }
 })
 
-router.get('/listarProductos', sessionOpen ,  async (req, res) => {
+router.get('/listarProductos', sessionOpen ,   async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -59,7 +59,7 @@ router.get('/listarProductos', sessionOpen ,  async (req, res) => {
   result.Productos = result.docs
   result.query = ""
   delete result.docs
-  res.render('home', { result , session: req.session  , admin: res.locals.isAdmin })
+  res.render('home', { result , session: req.session  , admin: res.locals.isAdmin }) 
 })
 
 router.get("/nuevoProducto", sessionOpen ,   async (req, res) => {

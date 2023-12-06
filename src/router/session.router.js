@@ -1,17 +1,12 @@
-import express from 'express'
-import session from 'express-session'
+//import express from 'express'
+//import session from 'express-session'
+import passport from 'passport'
 import { Router } from 'express';
-import sessionModel from '../dao/models/session.model.js'
+//import sessionModel from '../dao/models/session.model.js'
 
 
 const router = Router();
 
-/*
-router.use(session({
-    secret: 'secret',
-    resave: true,
-    saveUninitialized: true
-}))*/
 
 router.get('/', (req, res) => {
     console.log(req.session)
@@ -23,51 +18,53 @@ router.get('/login/registerView', (req, res) => {
     res.render('register', {})
 })
 
-router.post('/login/users', async (req, res) => {
-    try {
-        const { email, password } = req.body
-       // console.log('Datos del formulario:', email, password);
-        if(email === 'admin@gmail.com' && password === 'admin1234'){
-            req.session.user = { email: 'admin@gmail.com', password: 'admin1234' };
-            return res.redirect('/productos/listarProductos');   
-         }
+router.post(
+    '/login/users',
+    passport.authenticate('login', { failureRedirect: '/'   }),
+    async (req, res) => {
 
+        //passport login 
+        try {
+            if (!req.user) return res.status(400).send('Invalid Credentials')
+            req.session.user = req.user;
+            console.log(req.session.user)
+            res.redirect('/productos/listarProductos');
+        } catch (error) {
+            console.error('Error al redireccionar:', error);
+            res.status(500).send('Error al redireccionar');
+        }
 
-        const user = await sessionModel.findOne({ email, password })
-       // console.log('Usuario encontrado en la base de datos:', user);
-       
-        if (!user) {
-            return res.status(401).send('Invalid username or password');
-        }
-        else{
-            req.session.user = user
-           // console.log('Usuario autenticado:', req.session.user);
-            return  res.redirect('/productos/listarProductos');
-        }
-    } catch (error) {
-        console.error('Error during login:', error);
-        res.status(500).send(`IInternal Server Error ${error.message}`);
     }
-})
+)
 
-router.post('/login/register', async (req, res) => {
-    const user = req.body
-    await sessionModel.create(user)
-    res.redirect('/')
-})
+router.post(
+    '/login/register',
+    passport.authenticate('register', { failureRedirect: '/' }),
+    async (req, res) => {
+        res.redirect('/')
+    }
+)
 
 
 
 router.get('/logout', (req, res) => {
-    // Destruir la sesión
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error al destruir la sesión:', err);
-            return res.status(500).send('Error al cerrar sesión')
-        }
-
-        res.redirect('/')
-    })
+    if (req.isAuthenticated()) {
+        // Si el usuario todavía está autenticado, espera a que la sesión se destruya
+        req.session.destroy((err) => {
+            if (err) {
+                console.error('Error al destruir la sesión:', err);
+                res.status(500).send('Error al destruir la sesión');
+            } else {
+                // Redirige solo después de que la sesión se haya destruido completamente
+                res.redirect('/');
+            }
+        });
+    } else {
+        // Si el usuario no está autenticado, redirige inmediatamente
+        res.redirect('/');
+    }
 })
+
+
 
 export default router

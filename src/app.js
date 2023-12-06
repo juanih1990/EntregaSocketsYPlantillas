@@ -9,6 +9,8 @@ import CartMongo from "./router/cartMongo.router.js"
 import chatMongo from "./router/chatMongo.router.js"
 import session from 'express-session'
 import mongoStore from 'connect-mongo'
+import passport from 'passport'
+import initializePassport from './config/passport.config.js'
 
 const app = express()
 app.use(express.json())
@@ -43,7 +45,11 @@ app.use(session ({
     saveUninitialized: true
   }))
   
-
+//passport
+initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+ 
 // Middleware para usuarios normales
 function Auth(req, res, next) {
     if (req.session?.user) {
@@ -53,6 +59,7 @@ function Auth(req, res, next) {
         return res.render('errorSession',  {});
     }
 }
+
 
 app.use('/' , sessionRouter )
 app.use('/productos' , Auth, ProductsMongo) 
