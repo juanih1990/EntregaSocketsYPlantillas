@@ -21,6 +21,10 @@
             <div class="card-body">
                 <h5 class="card-title"> {{this.title}}</h5>
                 <p class="card-text">{{this.description}}</p>
+                <div class="d-flex justify-content-between">
+                    <p class="card-text" style="color: rgb(84, 84, 199)">Stock: {{this.stock}}</p>
+                    <p class="card-text" style="color: rgb(4, 95, 4)">$ {{this.price}}</p>
+                </div>
                 <button class="btn btn-danger delete" data-product-id="{{this._id}}">Delete</button>
                 <button class="btn btn-primary add" data-cart-id="{{this._id}}">Agregar al carrito</button>
             </div>
@@ -28,20 +32,7 @@
    
     {{/each}}
      </div>
-    {{!--
-    {{#each result.Productos}}
-    <hr>
-    <ul>
-        <li><span>Producto: {{this.title}}</span></li>
-        <li><span>Precio: {{this.price}}</span></li>
-        <li><span>Stock: {{this.stock}}</span></li>
-        <hr>
-        <button class="delete" data-product-id="{{this._id}}">Delete</button>
-        <button class="add" data-cart-id="{{this._id}}">Agregar al carrito</button>
-    </ul>
-    <hr>
-    {{/each}} --}}
-
+    
     <span>Total Products:</span> {{ result.totalDocs }} <br>
     <span>pages:</span> {{ result.page }} / {{ result.totalPages }} <br>
     <span>Limit: </span> <input id="limit" type="text" value="{{result.limit}}"><br>
