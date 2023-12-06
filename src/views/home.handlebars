@@ -25,8 +25,15 @@
                     <p class="card-text" style="color: rgb(84, 84, 199)">Stock: {{this.stock}}</p>
                     <p class="card-text" style="color: rgb(4, 95, 4)">$ {{this.price}}</p>
                 </div>
+                {{#if ../admin}}
                 <button class="btn btn-danger delete" data-product-id="{{this._id}}">Delete</button>
                 <button class="btn btn-primary add" data-cart-id="{{this._id}}">Agregar al carrito</button>
+                {{/if}}
+                {{#unless ../admin}}
+                <div class="d-flex justify-content-center">
+                    <button class="btn btn-primary add" data-cart-id="{{this._id}}">Agregar al carrito</button>
+                </div>  
+                {{/unless}}
             </div>
         </div>
    

@@ -45,8 +45,6 @@ router.post(
     }
 )
 
-
-
 router.get('/logout', (req, res) => {
     if (req.isAuthenticated()) {
         // Si el usuario todavía está autenticado, espera a que la sesión se destruya
