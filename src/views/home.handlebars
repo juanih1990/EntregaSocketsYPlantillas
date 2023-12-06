@@ -114,7 +114,7 @@
         const category = document.querySelector('#category').value
         const stockOnly = document.querySelector('#stockOnly').checked
 
-        let url = `http://localhost:8080/productos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+        let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
         if (category) {
             url += `&category=${category}`
@@ -136,7 +136,7 @@
         const category = document.querySelector('#category').value
         const stockOnly = document.querySelector('#stockOnly').checked
 
-        let url = `http://localhost:8080/productos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
+        let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
 
         if (category) {
             url += `&category=${category}`
@@ -158,7 +158,7 @@
         const category = document.querySelector('#category').value;
         const stockOnly = document.querySelector('#stockOnly').checked;
 
-        let url = `http://localhost:8080/productos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+        let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
         if (category) {
             url += `&category=${category}`
