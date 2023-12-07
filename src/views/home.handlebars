@@ -111,7 +111,6 @@
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
-
         //Variables. obtengo los campos de la vista que voy a utilizar en mi script
         const categorySelect = document.querySelector('#category')
         const btnSearch = document.querySelector('#btnSearch')
@@ -119,10 +118,8 @@
         const LimitSelected = document.querySelector('#limit')
         const atributoDeOrdenamiento = document.querySelector('#sortField')  // ordeno los campos por precio y nombre/titulo
         const formaDeOrdenamiento = document.querySelector('#sortOrder')  //indico si ordeno de mayor a menor o de menor a mayor
-        
-        
 
-        /////////////////////////////////////////////////////////        Funciones de botones, delete , agregar , next , prev    ////////////////////////////////
+        /////////////////////////////////////////////////////////        Funciones de botones, delete , add   ////////////////////////////////
         //Funcion del boton delete (solo administrador lo puede ver)
         const deleteButtons = document.querySelectorAll('.delete')
         deleteButtons.forEach(button => {
@@ -138,7 +135,6 @@
                     });
             };
         });
-
         //Funcion del boton agregar al carrito, el unico requisito es estar registrado 
         const addToCart = document.querySelectorAll('.add')
         addToCart.forEach(button => {
@@ -154,7 +150,91 @@
                     });
             };
         });
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        /////////////////////////////////////////////////////////         RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION    ////////////////////////////////
+        const queryParams = new URLSearchParams(window.location.search);
+        //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
+        const queryPage = queryParams.get('page')
+        if (queryPage > 0) {
+            updatePagination(queryPage)
+        }
+        else {
+            updatePagination(1)
+        }
+        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierto a booleano
+        const stockOnlyQueryParam = queryParams.get('stockOnly');
+        const stockOnly = stockOnlyQueryParam === 'true'
+        stockOnlyCheckbox.checked = stockOnly;
+        //ordenamiento por nombre o Preciio segun el campo sort de url
+        let atributoOrdenamiento = queryParams.get('sort')
+        if (atributoOrdenamiento) {
+            atributoDeOrdenamiento.value = atributoOrdenamiento
+        }
+        //ordenamiento mayor a menor o menor a mayor segun el campo order 
+        let sortOrder = queryParams.get('order')
+        if (sortOrder) {
+            formaDeOrdenamiento.value = sortOrder
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        ///////////////////////////////////////////////////////////////////////////////// Eventos para paginacion y busqueda ////////////////////////////////////////////////////////// 
+        LimitSelected.addEventListener('change', () => {
+            // Valida si el valor está fuera del rango permitido
+            if (LimitSelected.value < 1 || LimitSelected.value > 5) {
+                // Restablece el valor al límite más cercano
+                LimitSelected.value = Math.min(5, Math.max(1, LimitSelected.value));
+
+            }
+            searchPerform()
+        })
+        categorySelect.addEventListener('change', () => {
+            searchPerform()
+        })
+        stockOnlyCheckbox.addEventListener('change', () => {
+            searchPerform()
+        })
+        atributoDeOrdenamiento.addEventListener('change', () => {
+            searchPerform()
+        })
+        formaDeOrdenamiento.addEventListener('change', () => {
+            searchPerform()
+        })
+        btnSearch.addEventListener('click', () => {
+            searchPerform()
+        })
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /////////////////////////////////////////////////////////////////////// FUNCION DE BUSQUEDA ////////////////////////////////////////////////////////////////////////////////////
+        //se realiza cuando un usuario    1- cambia el limite de pagina  2-Realiza una busqueda query  3-Busca por categoria 4-Ordena por nombre , precio o modifica la forma de ordenar
+        function searchPerform() {
+            const page = document.querySelector('#page').value
+            const limit = document.querySelector('#limit').value
+            const query = document.querySelector('#query').value
+            const sortField = document.querySelector('#sortField').value
+            const sortOrder = document.querySelector('#sortOrder').value
+            const category = document.querySelector('#category').value.toUpperCase()
+            const stockOnly = document.querySelector('#stockOnly').checked
+            let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+
+
+            if (category) {
+                url += `&category=${category}`
+            }
+
+            if (stockOnly) {
+                url += '&stockOnly=true'
+            }
+            console.log("page: " + page + "limit: " + limit)
+            document.location.href = url
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /////////////////////////////////////////////////////////////////////// PAGINACION  ////////////////////////////////////////////////////////////////////////////////////
         //Funcion del boton pagina anterior,  permite volver a la pagina anterior, si estas en la pagina uno deshabilita el boton
         document.querySelector('#btnPrev').onclick = () => {
             const prevPage = document.querySelector('#prevPage').value
@@ -181,7 +261,6 @@
 
             document.location.href = url
         }
-      
         //Funcion del boton pagina siguiente o next m permite ir a la siguiente pagina, si estas en la ulitma pagina deshabilita el boton
         document.querySelector('#btnNext').onclick = () => {
             const nextPage = document.querySelector('#nextPage').value
@@ -208,101 +287,15 @@
 
             document.location.href = url
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         const pageLinks = document.querySelectorAll('.pagination .page-link')
         pageLinks.forEach(link => {
-            link.addEventListener('click', (event) => {  
+            link.addEventListener('click', (event) => {
                 event.preventDefault();
                 const clickedPage = link.getAttribute('data-value')
-                  let url = `http://localhost:8080/productos/listarProductos?page=${clickedPage}`
-                    document.location.href = url
-        })})
-
-        /////////////////////////////////////////////////////////         RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION    ////////////////////////////////
-        const queryParams = new URLSearchParams(window.location.search);
-        //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
-        const queryPage = queryParams.get('page')
-        if (queryPage > 0) {
-            updatePagination(queryPage)
-        }
-        else {
-            updatePagination(1)
-        }
-        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierto a booleano
-        const stockOnlyQueryParam = queryParams.get('stockOnly');
-        const stockOnly = stockOnlyQueryParam === 'true';
-        stockOnlyCheckbox.checked = stockOnly;
-        //ordenamiento por nombre o Preciio segun el campo sort de url
-        let atributoOrdenamiento = queryParams.get('sort')
-        if(atributoOrdenamiento){
-               atributoDeOrdenamiento.value = atributoOrdenamiento 
-        }
-        //ordenamiento mayor a menor o menor a mayor segun el campo order 
-        let sortOrder = queryParams.get('order')
-        if(sortOrder){
-            formaDeOrdenamiento.value = sortOrder
-        }
-        
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        ///////////////////////////////////////////////////////////////////////////////// Eventos para paginacion y busqueda ////////////////////////////////////////////////////////// 
-        LimitSelected.addEventListener('change', () => {
-            // Valida si el valor está fuera del rango permitido
-            if (LimitSelected.value < 1 || LimitSelected.value > 5) {
-                // Restablece el valor al límite más cercano
-                LimitSelected.value = Math.min(5, Math.max(1, LimitSelected.value));
-
-            }
-            searchPerform()
-
+                let url = `http://localhost:8080/productos/listarProductos?page=${clickedPage}`
+                document.location.href = url
+            })
         })
-        categorySelect.addEventListener('change', () => {
-            searchPerform()
-        })
-        stockOnlyCheckbox.addEventListener('change', () => {
-            searchPerform()
-        })
-        atributoDeOrdenamiento.addEventListener('change', () => {     
-            searchPerform()     
-        })
-        formaDeOrdenamiento.addEventListener('change' , () => {
-                searchPerform()
-        })
-        btnSearch.addEventListener('click', () => {
-            searchPerform()
-        })
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        /////////////////////////////////////////////////////////////////////// FUNCION DE BUSQUEDA ////////////////////////////////////////////////////////////////////////////////////
-
-        //se realiza cuando un usuario    1- cambia el limite de pagina  2-Realiza una busqueda query  3-Busca por categoria 4-Ordena por nombre , precio o modifica la forma de ordenar
-
-        function searchPerform() {
-            const page = document.querySelector('#page').value
-            const limit = document.querySelector('#limit').value
-            const query = document.querySelector('#query').value
-            const sortField = document.querySelector('#sortField').value
-            const sortOrder = document.querySelector('#sortOrder').value
-            const category = document.querySelector('#category').value.toUpperCase()
-            const stockOnly = document.querySelector('#stockOnly').checked
-            let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
-
-
-            if (category) {
-                url += `&category=${category}`
-            }
-
-            if (stockOnly) {
-                url += '&stockOnly=true'
-            }
-            console.log("page: " + page + "limit: " + limit)
-            document.location.href = url
-        }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
         //////////////////// La utilizo para la paginacion. para agregar la clse activa que pinta el numero  de pagina en el que estoy parado///////////////////////////////////////////
         function updatePagination(activePage) {
             const btnPrev = document.querySelector('#btnPrev')
