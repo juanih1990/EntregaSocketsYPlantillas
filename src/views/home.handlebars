@@ -2,28 +2,52 @@
 
     {{#if result.Productos}}
     <div class="d-flex justify-content-between m-4">
-        <div class="d-flex">
-            <h6 class="m-2">Total Products: {{ result.totalDocs }} </h6>
-            <h6 class="m-2">pages: {{ result.page }} / {{ result.totalPages }} </h6>
+        <div>
+            <div>
+                <h5 class="m-2">Total Products: {{ result.totalDocs }} </h5>
+            </div>
+            <div class="d-flex">
+                <h6 class="m-2">Limite de productos por pagina: </h6> <input class="text-center disabled " id="limit"
+                    type="number" min="1" max="5" value="{{result.limit}}" style="width: 45px">
+            </div>
         </div>
         <div>
-            <label for="category">Categoría:</label>
-            <select id="category" name="category">
-                <option value="">CATEGORIAS</option>
-                <option value="">TODOS</option>
-                <option value="Audio">AUDIO</option>
-                <option value="Periferico">PERIFERICO</option>
-                <option value="Notebook">NOTEBOOK</option>
-                <option value="Display">ALMACENAMIENTO</option>
-                <option value="Display">DISPLAY</option>
-            </select>
+            <h6>pages: {{ result.page }} / {{ result.totalPages }} </h6>
+        </div>
+        <div>
+            <div>
+                <label for="category">Categoría:</label>
+                <select id="category" name="category">
+                    <option value="">CATEGORIAS</option>
+                    <option value="">TODOS</option>
+                    <option value="Audio">AUDIO</option>
+                    <option value="Periferico">PERIFERICO</option>
+                    <option value="Notebook">NOTEBOOK</option>
+                    <option value="Display">ALMACENAMIENTO</option>
+                    <option value="Display">DISPLAY</option>
+                </select>
 
-            <label for="stockOnly">Mostrar solo productos disponibles:</label>
-            <input type="checkbox" id="stockOnly" name="stockOnly"><br><br>
+                <label for="stockOnly">Mostrar solo productos disponibles:</label>
+                <input type="checkbox" id="stockOnly" name="stockOnly"><br><br>
+            </div>
+
+            <div>
+                <label for="sortField">Ordenar por:</label>
+                <select id="sortField" name="sortField">
+                    <option value="title">Nombre</option>
+                    <option value="price">Precio</option>
+                </select>
+
+                <label for="sortOrder">Orden:</label>
+                <select id="sortOrder" name="sortOrder">
+                    <option value="asc">Menor a mayor</option>
+                    <option value="desc">Mayor a menor</option>
+                </select><br><br>
+            </div>
         </div>
     </div>
     <div class="d-flex justify-content-center align-items-center ">
-        <span>BUSCAR: </span> <input class="ms-3" type="text" value="{{result.query}}" id="query"> <button
+        <input class="ms-3" type="text" placeholder="Producto" value="{{result.query}}" id="query"> <button
             class="btn btn-secondary ms-3" id="btnSearch">Buscar</button><br><br>
     </div>
     <div class="d-flex flex-wrap justify-content-center ">
@@ -60,6 +84,7 @@
     <input id="cantPaginas" type="hidden" value="{{Paginacion}}">
     <input id="prevPage" type="hidden" value="{{result.prevPage}}">
     <input id="nextPage" type="hidden" value="{{result.nextPage}}">
+    <input id="page" type="hidden" value="{{result.page}}">
 
     <div class="d-flex justify-content-center m-4">
 
@@ -69,7 +94,7 @@
                     <a class="page-link" href="#">Previous</a>
                 </li>
                 {{#each Paginacion}}
-                <li class="page-item  " aria-current="page"><a data-value="{{this}}" class="page-link activePage"
+                <li class="page-item" aria-current="page"><a data-value="{{this}}" class="page-link activePage"
                         href="#">{{this}}</a></li>
                 {{/each}}
                 <li id="btnNext" class="page-item">
@@ -77,52 +102,7 @@
                 </li>
             </ul>
         </nav>
-        {{!-- <nav aria-label="Page navigation example">
-            <ul class="pagination">
-                <li id="btnPrev" class="page-item disabled">
-                    <a class="page-link" href="#">Previous</a>
-                </li>
-
-
-
-
-
-                {{#each Paginacion}}
-                <li class="page-item active" aria-current="page"><a class="page-link" href="#">{{this}}</a></li>
-                {{/each}}
-
-                <li id="btnNext" class="page-item"><a class="page-link" href="#">Next</a></li>
-            </ul>
-        </nav> --}}
     </div>
-
-
-
-    <span>Limit: </span> <input id="limit" type="text" value="{{result.limit}}"><br>
-    <span>Page: </span> <input id="page" type="text" value="{{result.page}}"><br>
-
-
-
-    <label for="sortField">Ordenar por:</label>
-    <select id="sortField" name="sortField">
-        <option value="title">Nombre</option>
-        <option value="price">Precio</option>
-    </select>
-
-    <label for="sortOrder">Orden:</label>
-    <select id="sortOrder" name="sortOrder">
-        <option value="asc">Menor a mayor</option>
-        <option value="desc">Mayor a menor</option>
-    </select><br><br>
-
-
-
-
-
-
-    {{!--
-    <a id="btnPrev" href="#" {{#unless result.hasPrevPage}} style="display: none" {{/unless}}> Anterior </a>
-    <a id="btnNext" href="#" {{#unless result.hasNextPage}} style="display: none" {{/unless}}> Siguiente </a><br> --}}
 
     {{/if}}
 </div>
@@ -130,6 +110,20 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
+
+
+        //Variables. obtengo los campos de la vista que voy a utilizar en mi script
+        const categorySelect = document.querySelector('#category')
+        const btnSearch = document.querySelector('#btnSearch')
+        const stockOnlyCheckbox = document.querySelector('#stockOnly');
+        const LimitSelected = document.querySelector('#limit')
+        const atributoDeOrdenamiento = document.querySelector('#sortField')  // ordeno los campos por precio y nombre/titulo
+        const formaDeOrdenamiento = document.querySelector('#sortOrder')  //indico si ordeno de mayor a menor o de menor a mayor
+        
+        
+
+        /////////////////////////////////////////////////////////        Funciones de botones, delete , agregar , next , prev    ////////////////////////////////
+        //Funcion del boton delete (solo administrador lo puede ver)
         const deleteButtons = document.querySelectorAll('.delete')
         deleteButtons.forEach(button => {
             button.onclick = e => {
@@ -145,8 +139,7 @@
             };
         });
 
-
-
+        //Funcion del boton agregar al carrito, el unico requisito es estar registrado 
         const addToCart = document.querySelectorAll('.add')
         addToCart.forEach(button => {
             button.onclick = e => {
@@ -162,6 +155,7 @@
             };
         });
 
+        //Funcion del boton pagina anterior,  permite volver a la pagina anterior, si estas en la pagina uno deshabilita el boton
         document.querySelector('#btnPrev').onclick = () => {
             const prevPage = document.querySelector('#prevPage').value
             const limit = document.querySelector('#limit').value
@@ -171,13 +165,9 @@
             const category = document.querySelector('#category').value.toUpperCase()
             const stockOnly = document.querySelector('#stockOnly').checked
 
-            //const cantPaginas = document.querySelector('#cantPaginas').value
-
             if (btnPrev.classList.contains('disabled')) {
                 return; // Evita la ejecución del código si el botón está deshabilitado
             }
-
-
 
             let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
@@ -191,7 +181,8 @@
 
             document.location.href = url
         }
-
+      
+        //Funcion del boton pagina siguiente o next m permite ir a la siguiente pagina, si estas en la ulitma pagina deshabilita el boton
         document.querySelector('#btnNext').onclick = () => {
             const nextPage = document.querySelector('#nextPage').value
             const limit = document.querySelector('#limit').value
@@ -200,14 +191,10 @@
             const sortOrder = document.querySelector('#sortOrder').value
             const category = document.querySelector('#category').value.toUpperCase()
             const stockOnly = document.querySelector('#stockOnly').checked
-           // const cantPaginas = document.querySelector('#cantPaginas').value
 
             if (btnNext.classList.contains('disabled')) {
                 return; // Evita la ejecución del código si el botón está deshabilitado
             }
-
-
-
 
             let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
 
@@ -221,12 +208,17 @@
 
             document.location.href = url
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        const pageLinks = document.querySelectorAll('.pagination .page-link')
+        pageLinks.forEach(link => {
+            link.addEventListener('click', (event) => {  
+                event.preventDefault();
+                const clickedPage = link.getAttribute('data-value')
+                  let url = `http://localhost:8080/productos/listarProductos?page=${clickedPage}`
+                    document.location.href = url
+        })})
 
-        const categorySelect = document.querySelector('#category');
-        const btnSearch = document.querySelector('#btnSearch');
-        const stockOnlyCheckbox = document.querySelector('#stockOnly');
-
-        //RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION
+        /////////////////////////////////////////////////////////         RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION    ////////////////////////////////
         const queryParams = new URLSearchParams(window.location.search);
         //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
         const queryPage = queryParams.get('page')
@@ -236,24 +228,56 @@
         else {
             updatePagination(1)
         }
-
-        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierte a booleano
+        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierto a booleano
         const stockOnlyQueryParam = queryParams.get('stockOnly');
         const stockOnly = stockOnlyQueryParam === 'true';
-        // Establece el estado del checkbox según el valor obtenido
         stockOnlyCheckbox.checked = stockOnly;
+        //ordenamiento por nombre o Preciio segun el campo sort de url
+        let atributoOrdenamiento = queryParams.get('sort')
+        if(atributoOrdenamiento){
+               atributoDeOrdenamiento.value = atributoOrdenamiento 
+        }
+        //ordenamiento mayor a menor o menor a mayor segun el campo order 
+        let sortOrder = queryParams.get('order')
+        if(sortOrder){
+            formaDeOrdenamiento.value = sortOrder
+        }
+        
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+        ///////////////////////////////////////////////////////////////////////////////// Eventos para paginacion y busqueda ////////////////////////////////////////////////////////// 
+        LimitSelected.addEventListener('change', () => {
+            // Valida si el valor está fuera del rango permitido
+            if (LimitSelected.value < 1 || LimitSelected.value > 5) {
+                // Restablece el valor al límite más cercano
+                LimitSelected.value = Math.min(5, Math.max(1, LimitSelected.value));
+
+            }
+            searchPerform()
+
+        })
         categorySelect.addEventListener('change', () => {
-            searchPerform();
-        });
-
+            searchPerform()
+        })
         stockOnlyCheckbox.addEventListener('change', () => {
-            searchPerform();
-        });
-
+            searchPerform()
+        })
+        atributoDeOrdenamiento.addEventListener('change', () => {     
+            searchPerform()     
+        })
+        formaDeOrdenamiento.addEventListener('change' , () => {
+                searchPerform()
+        })
         btnSearch.addEventListener('click', () => {
-            searchPerform();
-        });
+            searchPerform()
+        })
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        /////////////////////////////////////////////////////////////////////// FUNCION DE BUSQUEDA ////////////////////////////////////////////////////////////////////////////////////
+
+        //se realiza cuando un usuario    1- cambia el limite de pagina  2-Realiza una busqueda query  3-Busca por categoria 4-Ordena por nombre , precio o modifica la forma de ordenar
 
         function searchPerform() {
             const page = document.querySelector('#page').value
@@ -265,6 +289,7 @@
             const stockOnly = document.querySelector('#stockOnly').checked
             let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
+
             if (category) {
                 url += `&category=${category}`
             }
@@ -272,10 +297,13 @@
             if (stockOnly) {
                 url += '&stockOnly=true'
             }
-
+            console.log("page: " + page + "limit: " + limit)
             document.location.href = url
         }
-      
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+        //////////////////// La utilizo para la paginacion. para agregar la clse activa que pinta el numero  de pagina en el que estoy parado///////////////////////////////////////////
         function updatePagination(activePage) {
             const btnPrev = document.querySelector('#btnPrev')
             const btnNext = document.querySelector('#btnNext')
@@ -289,17 +317,15 @@
             if (currentPageItem) {
                 currentPageItem.parentNode.classList.add('active');
             }
-            console.log("Active Page:", activePage);
-            console.log("Btn Prev:", btnPrev);
-           
-            const cant = cantPaginas.length - 1 
+
+            const cant = cantPaginas.length - 1
             // Deshabilita el botón "Previous" si estás en la primera página
-        
-             btnPrev.classList.toggle('disabled', activePage == 1);
+
+            btnPrev.classList.toggle('disabled', activePage == 1);
 
             // Deshabilita el botón "Next" si estás en la ultima página
-             btnNext.classList.toggle('disabled', activePage == cant )
-
+            btnNext.classList.toggle('disabled', activePage == cant)
         }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     });
 </script>
