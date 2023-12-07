@@ -16,15 +16,15 @@
         </div>
         <div>
             <div>
+                
                 <label for="category">Categoría:</label> {{!-- lo ideal es traer todas las categorias existentes de mi
                 base de datos (lo voy a ser con tiempo) --}}
                 <select id="category" name="category">
                     <option value="">CATEGORIAS</option>
                     <option value="">TODOS</option>
-                    <option value="Audio">AUDIO</option>
-                    <option value="Periferico">PERIFERICO</option>
-                    <option value="Display">ALMACENAMIENTO</option>
-                    <option value="Display">DISPLAY</option>
+                    {{#each result.Productos}}
+                    <option value={{this.category}}>{{this.category}}</option>
+                    {{/each}}
                 </select>
 
                 <label for="stockOnly">Mostrar solo productos disponibles:</label>
