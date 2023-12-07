@@ -17,7 +17,6 @@ function sessionOpen(req, res, next) {
 
 router.post('/', (req, res) => {
   try {
-    console.log("entro a agregar")
     const newProduct = req.body
     productManagerMongo.AgregarProductos(newProduct)
     res.redirect('/productos/listarProductos')
@@ -26,7 +25,7 @@ router.post('/', (req, res) => {
   }
 })
 
-router.get('/listarProductos', sessionOpen ,   async (req, res) => {
+router.get('/listarProductos', sessionOpen, async (req, res) => {
   const limit = parseInt(req.query?.limit ?? 4)
   const page = parseInt(req.query?.page ?? 1)
   const query = req.query?.query ?? ''
@@ -34,8 +33,6 @@ router.get('/listarProductos', sessionOpen ,   async (req, res) => {
   const sortOrder = req.query?.order ?? 'asc'
   const category = req.query?.category || ''
   const stockOnly = req.query?.stockOnly === 'true'
-
-  
 
   const search = {}
 
@@ -59,16 +56,25 @@ router.get('/listarProductos', sessionOpen ,   async (req, res) => {
   result.Productos = result.docs
   result.query = ""
   delete result.docs
-  res.render('home', { result , session: req.session  , admin: res.locals.isAdmin }) 
+
+
+  //Lo hago para crear los <li> dentro de la paginacion debajo de los productos
+  var paginas = result.totalPages;
+  var PaginationDocs = [];
+  for (var i = 1 ; i < paginas + 1 ; i++) {
+    PaginationDocs.push(i);
+  }
+  ////////////////////////////////////////
+  res.render('home', { result, session: req.session, admin: res.locals.isAdmin, Paginacion: PaginationDocs })
 })
 
-router.get("/nuevoProducto", sessionOpen ,   async (req, res) => {
+router.get("/nuevoProducto", sessionOpen, async (req, res) => {
 
-  if(res.locals.isAdmin){
-    res.render('create', {admin: res.locals.isAdmin})
+  if (res.locals.isAdmin) {
+    res.render('create', { admin: res.locals.isAdmin })
   }
-  else{
-    return res.render('errorSession' , { admin } ) 
+  else {
+    return res.render('errorSession', { admin })
   }
 })
 

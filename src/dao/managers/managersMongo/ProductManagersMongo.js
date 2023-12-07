@@ -41,7 +41,6 @@ class ProductManagerMongo {
                 }
                 //agrego el producto
                 const result = await ProductsModel.create(product)
-                console.log(result + " se agrego un nuevo producto")
             }
         }
     }

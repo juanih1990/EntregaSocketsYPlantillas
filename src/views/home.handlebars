@@ -1,23 +1,39 @@
 <div>
-    {{!-- <h1> Productos desde de FleSystem</h1>
-    {{#each products }}
-    <hr>
-    <ul>
-        <li>{{this.title}}</li>
-        <li><span>{{this.price}}</span></li>
-    </ul>
-    <hr>
-    {{/each}}
-</div> --}}
-
-<div>
 
     {{#if result.Productos}}
-     <div class="d-flex flex-wrap justify-content-center ">   
-    {{#each result.Productos}}
-   
+    <div class="d-flex justify-content-between m-4">
+        <div class="d-flex">
+            <h6 class="m-2">Total Products: {{ result.totalDocs }} </h6>
+            <h6 class="m-2">pages: {{ result.page }} / {{ result.totalPages }} </h6>
+        </div>
+        <div>
+            <label for="category">Categoría:</label>
+            <select id="category" name="category">
+                <option value="">CATEGORIAS</option>
+                <option value="">TODOS</option>
+                <option value="Audio">AUDIO</option>
+                <option value="Periferico">PERIFERICO</option>
+                <option value="Notebook">NOTEBOOK</option>
+                <option value="Display">ALMACENAMIENTO</option>
+                <option value="Display">DISPLAY</option>
+            </select>
+
+            <label for="stockOnly">Mostrar solo productos disponibles:</label>
+            <input type="checkbox" id="stockOnly" name="stockOnly"><br><br>
+        </div>
+    </div>
+    <div class="d-flex justify-content-center align-items-center ">
+        <span>BUSCAR: </span> <input class="ms-3" type="text" value="{{result.query}}" id="query"> <button
+            class="btn btn-secondary ms-3" id="btnSearch">Buscar</button><br><br>
+    </div>
+    <div class="d-flex flex-wrap justify-content-center ">
+        {{#each result.Productos}}
+
         <div class="card m-4 " style="width: 18rem; height: auto">
-            <img src="{{this.thumbnail}}" class="card-img-top img-fluid container"  style=" height: 265px" alt="...">
+            <div class="d-flex justify-content-center align-items-center" style=" height: 265px">
+                <img src="{{this.thumbnail}}" class="card-img-top img-fluid container"
+                    style="width: 190px ; height: 200px" alt="...">
+            </div>
             <div class="card-body">
                 <h5 class="card-title"> {{this.title}}</h5>
                 <p class="card-text">{{this.description}}</p>
@@ -32,19 +48,59 @@
                 {{#unless ../admin}}
                 <div class="d-flex justify-content-center">
                     <button class="btn btn-primary add" data-cart-id="{{this._id}}">Agregar al carrito</button>
-                </div>  
+                </div>
                 {{/unless}}
             </div>
         </div>
-   
-    {{/each}}
-     </div>
-    
-    <span>Total Products:</span> {{ result.totalDocs }} <br>
-    <span>pages:</span> {{ result.page }} / {{ result.totalPages }} <br>
+
+        {{/each}}
+    </div>
+
+    {{!-- estos campos input los utilizo para extraer informacion --}}
+    <input id="cantPaginas" type="hidden" value="{{Paginacion}}">
+    <input id="prevPage" type="hidden" value="{{result.prevPage}}">
+    <input id="nextPage" type="hidden" value="{{result.nextPage}}">
+
+    <div class="d-flex justify-content-center m-4">
+
+        <nav aria-label="...">
+            <ul class="pagination">
+                <li id="btnPrev" class="page-item ">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+                {{#each Paginacion}}
+                <li class="page-item  " aria-current="page"><a data-value="{{this}}" class="page-link activePage"
+                        href="#">{{this}}</a></li>
+                {{/each}}
+                <li id="btnNext" class="page-item">
+                    <a class="page-link" href="#">Next</a>
+                </li>
+            </ul>
+        </nav>
+        {{!-- <nav aria-label="Page navigation example">
+            <ul class="pagination">
+                <li id="btnPrev" class="page-item disabled">
+                    <a class="page-link" href="#">Previous</a>
+                </li>
+
+
+
+
+
+                {{#each Paginacion}}
+                <li class="page-item active" aria-current="page"><a class="page-link" href="#">{{this}}</a></li>
+                {{/each}}
+
+                <li id="btnNext" class="page-item"><a class="page-link" href="#">Next</a></li>
+            </ul>
+        </nav> --}}
+    </div>
+
+
+
     <span>Limit: </span> <input id="limit" type="text" value="{{result.limit}}"><br>
     <span>Page: </span> <input id="page" type="text" value="{{result.page}}"><br>
-    <span>Query: </span> <input type="text" value="{{result.query}}" id="query"><br><br>
+
 
 
     <label for="sortField">Ordenar por:</label>
@@ -59,129 +115,191 @@
         <option value="desc">Mayor a menor</option>
     </select><br><br>
 
-    <label for="category">Categoría:</label>
-    <select id="category" name="category">
-        <option value="">Todos</option>
-        <option value="Audio">Audio</option>
-        <option value="Periferico">Periférico</option>
-        <option value="Notebook">Notebook</option>
-        <option value="Display">Display</option>
-    </select>
-
-    <label for="stockOnly">Mostrar solo productos disponibles:</label>
-    <input type="checkbox" id="stockOnly" name="stockOnly"><br><br>
 
 
 
-    <button id="btnSearch">Buscar</button><br><br>
 
-    <input id="prevPage" type="hidden" value="{{result.prevPage}}">
-    <input id="nextPage" type="hidden" value="{{result.nextPage}}">
 
+    {{!--
     <a id="btnPrev" href="#" {{#unless result.hasPrevPage}} style="display: none" {{/unless}}> Anterior </a>
-    <a id="btnNext" href="#" {{#unless result.hasNextPage}} style="display: none" {{/unless}}> Siguiente </a><br>
+    <a id="btnNext" href="#" {{#unless result.hasNextPage}} style="display: none" {{/unless}}> Siguiente </a><br> --}}
 
     {{/if}}
 </div>
 
 
 <script>
+    document.addEventListener('DOMContentLoaded', (event) => {
+        const deleteButtons = document.querySelectorAll('.delete')
+        deleteButtons.forEach(button => {
+            button.onclick = e => {
+                const id = button.dataset.productId;
+                fetch(`/productos/${id}`, { method: 'delete' })
+                    .then(() => {
+                        alert('Eliminado con éxito' + id);
+                        document.location.href = '/productos/listarProductos'
+                    })
+                    .catch(e => {
+                        alert('No se puede eliminar el producto')
+                    });
+            };
+        });
 
-    const deleteButtons = document.querySelectorAll('.delete')
-    deleteButtons.forEach(button => {
-        button.onclick = e => {
-            const id = button.dataset.productId;
-            fetch(`/productos/${id}`, { method: 'delete' })
-                .then(() => {
-                    alert('Eliminado con éxito' + id);
-                    document.location.href = '/productos/listarProductos'
-                })
-                .catch(e => {
-                    alert('No se puede eliminar el producto')
-                });
-        };
+
+
+        const addToCart = document.querySelectorAll('.add')
+        addToCart.forEach(button => {
+            button.onclick = e => {
+                const id = button.dataset.cartId;
+                fetch(`/productos/${id}`, { method: 'post' })
+                    .then(() => {
+                        alert('Se agrego el producto' + id + " al carrito")
+                        document.location.href = '/productos/listarProductos'
+                    })
+                    .catch(e => {
+                        alert(e)
+                    });
+            };
+        });
+
+        document.querySelector('#btnPrev').onclick = () => {
+            const prevPage = document.querySelector('#prevPage').value
+            const limit = document.querySelector('#limit').value
+            const query = document.querySelector('#query').value
+            const sortField = document.querySelector('#sortField').value
+            const sortOrder = document.querySelector('#sortOrder').value
+            const category = document.querySelector('#category').value.toUpperCase()
+            const stockOnly = document.querySelector('#stockOnly').checked
+
+            //const cantPaginas = document.querySelector('#cantPaginas').value
+
+            if (btnPrev.classList.contains('disabled')) {
+                return; // Evita la ejecución del código si el botón está deshabilitado
+            }
+
+
+
+            let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+
+            if (category) {
+                url += `&category=${category}`
+            }
+
+            if (stockOnly) {
+                url += '&stockOnly=true'
+            }
+
+            document.location.href = url
+        }
+
+        document.querySelector('#btnNext').onclick = () => {
+            const nextPage = document.querySelector('#nextPage').value
+            const limit = document.querySelector('#limit').value
+            const query = document.querySelector('#query').value
+            const sortField = document.querySelector('#sortField').value
+            const sortOrder = document.querySelector('#sortOrder').value
+            const category = document.querySelector('#category').value.toUpperCase()
+            const stockOnly = document.querySelector('#stockOnly').checked
+           // const cantPaginas = document.querySelector('#cantPaginas').value
+
+            if (btnNext.classList.contains('disabled')) {
+                return; // Evita la ejecución del código si el botón está deshabilitado
+            }
+
+
+
+
+            let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
+
+            if (category) {
+                url += `&category=${category}`
+            }
+
+            if (stockOnly) {
+                url += '&stockOnly=true'
+            }
+
+            document.location.href = url
+        }
+
+        const categorySelect = document.querySelector('#category');
+        const btnSearch = document.querySelector('#btnSearch');
+        const stockOnlyCheckbox = document.querySelector('#stockOnly');
+
+        //RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION
+        const queryParams = new URLSearchParams(window.location.search);
+        //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
+        const queryPage = queryParams.get('page')
+        if (queryPage > 0) {
+            updatePagination(queryPage)
+        }
+        else {
+            updatePagination(1)
+        }
+
+        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierte a booleano
+        const stockOnlyQueryParam = queryParams.get('stockOnly');
+        const stockOnly = stockOnlyQueryParam === 'true';
+        // Establece el estado del checkbox según el valor obtenido
+        stockOnlyCheckbox.checked = stockOnly;
+
+        categorySelect.addEventListener('change', () => {
+            searchPerform();
+        });
+
+        stockOnlyCheckbox.addEventListener('change', () => {
+            searchPerform();
+        });
+
+        btnSearch.addEventListener('click', () => {
+            searchPerform();
+        });
+
+        function searchPerform() {
+            const page = document.querySelector('#page').value
+            const limit = document.querySelector('#limit').value
+            const query = document.querySelector('#query').value
+            const sortField = document.querySelector('#sortField').value
+            const sortOrder = document.querySelector('#sortOrder').value
+            const category = document.querySelector('#category').value.toUpperCase()
+            const stockOnly = document.querySelector('#stockOnly').checked
+            let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+
+            if (category) {
+                url += `&category=${category}`
+            }
+
+            if (stockOnly) {
+                url += '&stockOnly=true'
+            }
+
+            document.location.href = url
+        }
+      
+        function updatePagination(activePage) {
+            const btnPrev = document.querySelector('#btnPrev')
+            const btnNext = document.querySelector('#btnNext')
+            const cantPaginas = document.querySelector('#cantPaginas').value
+            // Elimina la clase "active" de todos los elementos de página
+            const pageItems = document.querySelectorAll('.pagination .page-item');
+            pageItems.forEach(item => item.classList.remove('active'));
+
+            // Agrega la clase "active" al elemento de la página actual
+            const currentPageItem = document.querySelector(`.pagination .page-item a[data-value="${activePage}"]`);
+            if (currentPageItem) {
+                currentPageItem.parentNode.classList.add('active');
+            }
+            console.log("Active Page:", activePage);
+            console.log("Btn Prev:", btnPrev);
+           
+            const cant = cantPaginas.length - 1 
+            // Deshabilita el botón "Previous" si estás en la primera página
+        
+             btnPrev.classList.toggle('disabled', activePage == 1);
+
+            // Deshabilita el botón "Next" si estás en la ultima página
+             btnNext.classList.toggle('disabled', activePage == cant )
+
+        }
     });
-
-
-
-    const addToCart = document.querySelectorAll('.add')
-    addToCart.forEach(button => {
-        button.onclick = e => {
-            const id = button.dataset.cartId;
-            fetch(`/productos/${id}`, { method: 'post' })
-                .then(() => {
-                    alert('Se agrego el producto' + id + " al carrito")
-                    document.location.href = '/productos/listarProductos'
-                })
-                .catch(e => {
-                    alert(e)
-                });
-        };
-    });
-
-    document.querySelector('#btnPrev').onclick = () => {
-        const prevPage = document.querySelector('#prevPage').value
-        const limit = document.querySelector('#limit').value
-        const query = document.querySelector('#query').value
-        const sortField = document.querySelector('#sortField').value
-        const sortOrder = document.querySelector('#sortOrder').value
-        const category = document.querySelector('#category').value
-        const stockOnly = document.querySelector('#stockOnly').checked
-
-        let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
-
-        if (category) {
-            url += `&category=${category}`
-        }
-
-        if (stockOnly) {
-            url += '&stockOnly=true'
-        }
-
-        document.location.href = url
-    }
-
-    document.querySelector('#btnNext').onclick = () => {
-        const nextPage = document.querySelector('#nextPage').value
-        const limit = document.querySelector('#limit').value
-        const query = document.querySelector('#query').value
-        const sortField = document.querySelector('#sortField').value
-        const sortOrder = document.querySelector('#sortOrder').value
-        const category = document.querySelector('#category').value
-        const stockOnly = document.querySelector('#stockOnly').checked
-
-        let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
-
-        if (category) {
-            url += `&category=${category}`
-        }
-
-        if (stockOnly) {
-            url += '&stockOnly=true'
-        }
-
-        document.location.href = url
-    }
-
-    document.querySelector("#btnSearch").onclick = () => {
-        const page = document.querySelector('#page').value
-        const limit = document.querySelector('#limit').value
-        const query = document.querySelector('#query').value
-        const sortField = document.querySelector('#sortField').value
-        const sortOrder = document.querySelector('#sortOrder').value
-        const category = document.querySelector('#category').value;
-        const stockOnly = document.querySelector('#stockOnly').checked;
-
-        let url = `http://localhost:8080/productos/listarProductos?page=${page}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
-
-        if (category) {
-            url += `&category=${category}`
-        }
-
-        if (stockOnly) {
-            url += '&stockOnly=true'
-        }
-
-        document.location.href = url
-    }
 </script>
