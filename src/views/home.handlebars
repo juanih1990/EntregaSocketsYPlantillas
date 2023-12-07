@@ -16,13 +16,13 @@
         </div>
         <div>
             <div>
-                <label for="category">Categoría:</label>
+                <label for="category">Categoría:</label> {{!-- lo ideal es traer todas las categorias existentes de mi
+                base de datos (lo voy a ser con tiempo) --}}
                 <select id="category" name="category">
                     <option value="">CATEGORIAS</option>
                     <option value="">TODOS</option>
                     <option value="Audio">AUDIO</option>
                     <option value="Periferico">PERIFERICO</option>
-                    <option value="Notebook">NOTEBOOK</option>
                     <option value="Display">ALMACENAMIENTO</option>
                     <option value="Display">DISPLAY</option>
                 </select>
@@ -111,106 +111,101 @@
 <script>
     document.addEventListener('DOMContentLoaded', (event) => {
 
-        //Variables. obtengo los campos de la vista que voy a utilizar en mi script
-        const categorySelect = document.querySelector('#category')
-        const btnSearch = document.querySelector('#btnSearch')
-        const stockOnlyCheckbox = document.querySelector('#stockOnly');
+        //Varialbles
         const LimitSelected = document.querySelector('#limit')
+        const categorySelect = document.querySelector('#category')
+        const queryParams = new URLSearchParams(window.location.search);
+        const stockOnlyQueryParam = queryParams.get('stockOnly'); // Obtiene el valor de 'stockOnly' de la cadena de consulta  
+        const stockOnlyCheckbox = document.querySelector('#stockOnly');
+        const btnSearch = document.querySelector('#btnSearch')
         const atributoDeOrdenamiento = document.querySelector('#sortField')  // ordeno los campos por precio y nombre/titulo
         const formaDeOrdenamiento = document.querySelector('#sortOrder')  //indico si ordeno de mayor a menor o de menor a mayor
 
-        /////////////////////////////////////////////////////////        Funciones de botones, delete , add   ////////////////////////////////
-        //Funcion del boton delete (solo administrador lo puede ver)
-        const deleteButtons = document.querySelectorAll('.delete')
-        deleteButtons.forEach(button => {
-            button.onclick = e => {
-                const id = button.dataset.productId;
-                fetch(`/productos/${id}`, { method: 'delete' })
-                    .then(() => {
-                        alert('Eliminado con éxito' + id);
-                        document.location.href = '/productos/listarProductos'
-                    })
-                    .catch(e => {
-                        alert('No se puede eliminar el producto')
-                    });
-            };
-        });
-        //Funcion del boton agregar al carrito, el unico requisito es estar registrado 
-        const addToCart = document.querySelectorAll('.add')
-        addToCart.forEach(button => {
-            button.onclick = e => {
-                const id = button.dataset.cartId;
-                fetch(`/productos/${id}`, { method: 'post' })
-                    .then(() => {
-                        alert('Se agrego el producto' + id + " al carrito")
-                        document.location.href = '/productos/listarProductos'
-                    })
-                    .catch(e => {
-                        alert(e)
-                    });
-            };
-        });
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        /////////////////////////////////////////////////////////         RECUPERO DATOS POR PARAMETROS PARA NO PERDERLOS DESPUES DE LA REDIRECCION    ////////////////////////////////
-        const queryParams = new URLSearchParams(window.location.search);
-        //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
-        const queryPage = queryParams.get('page')
-        if (queryPage > 0) {
-            updatePagination(queryPage)
-        }
-        else {
-            updatePagination(1)
-        }
-        // Obtiene el valor de 'stockOnly' de la cadena de consulta y lo convierto a booleano
-        const stockOnlyQueryParam = queryParams.get('stockOnly');
-        const stockOnly = stockOnlyQueryParam === 'true'
-        stockOnlyCheckbox.checked = stockOnly;
-        //ordenamiento por nombre o Preciio segun el campo sort de url
-        let atributoOrdenamiento = queryParams.get('sort')
-        if (atributoOrdenamiento) {
-            atributoDeOrdenamiento.value = atributoOrdenamiento
-        }
-        //ordenamiento mayor a menor o menor a mayor segun el campo order 
-        let sortOrder = queryParams.get('order')
-        if (sortOrder) {
-            formaDeOrdenamiento.value = sortOrder
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-        ///////////////////////////////////////////////////////////////////////////////// Eventos para paginacion y busqueda ////////////////////////////////////////////////////////// 
-        LimitSelected.addEventListener('change', () => {
-            // Valida si el valor está fuera del rango permitido
-            if (LimitSelected.value < 1 || LimitSelected.value > 5) {
-                // Restablece el valor al límite más cercano
-                LimitSelected.value = Math.min(5, Math.max(1, LimitSelected.value));
-
+        const inicializarPagina = () => {
+            // Lógica de inicialización 
+            const queryPage = queryParams.get('page')  //Obtengo el numero de pagina actual y lo pongo como activo en la paginacion.    
+            if (queryPage > 0) {
+                updatePagination(queryPage)
             }
-            searchPerform()
-        })
-        categorySelect.addEventListener('change', () => {
-            searchPerform()
-        })
-        stockOnlyCheckbox.addEventListener('change', () => {
-            searchPerform()
-        })
-        atributoDeOrdenamiento.addEventListener('change', () => {
-            searchPerform()
-        })
-        formaDeOrdenamiento.addEventListener('change', () => {
-            searchPerform()
-        })
-        btnSearch.addEventListener('click', () => {
-            searchPerform()
-        })
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+            else {
+                updatePagination(1)
+            }
+            const stockOnly = stockOnlyQueryParam === 'true' //lo convierto a booleano
+            stockOnlyCheckbox.checked = stockOnly;
+            let atributoOrdenamiento = queryParams.get('sort') //ordenamiento por nombre o Preciio segun el campo sort de url
+            if (atributoOrdenamiento) {
+                atributoDeOrdenamiento.value = atributoOrdenamiento
+            }
+            let sortOrder = queryParams.get('order')    //ordenamiento mayor a menor o menor a mayor segun el campo order 
+            if (sortOrder) {
+                formaDeOrdenamiento.value = sortOrder
+            }
+            function updatePagination(activePage) {
+                const btnPrev = document.querySelector('#btnPrev')
+                const btnNext = document.querySelector('#btnNext')
+                const cantPaginas = document.querySelector('#cantPaginas').value
+                // Elimina la clase "active" de todos los elementos de página
+                const pageItems = document.querySelectorAll('.pagination .page-item');
+                pageItems.forEach(item => item.classList.remove('active'));
+
+                // Agrega la clase "active" al elemento de la página actual
+                const currentPageItem = document.querySelector(`.pagination .page-item a[data-value="${activePage}"]`);
+                if (currentPageItem) {
+                    currentPageItem.parentNode.classList.add('active');
+                }
+
+                const cant = cantPaginas.length - 1
+                // Deshabilita el botón "Previous" si estás en la primera página
+
+                btnPrev.classList.toggle('disabled', activePage == 1);
+
+                // Deshabilita el botón "Next" si estás en la ultima página
+                btnNext.classList.toggle('disabled', activePage == cant)
+            }
+
+        };
+
+        const manejarClicEliminar = (e) => {
+            // Lógica de clic en el botón eliminar      
+            const deleteButtons = document.querySelectorAll('.delete')    //Funcion del boton delete (solo administrador lo puede ver)
+            deleteButtons.forEach(button => {
+                button.onclick = e => {
+                    const id = button.dataset.productId;
+                    fetch(`/productos/${id}`, { method: 'delete' })
+                        .then(() => {
+                            alert('Eliminado con éxito' + id)
+                            document.location.href = '/productos/listarProductos'
+                        })
+                        .catch(e => {
+                            alert('No se puede eliminar el producto')
+                        })
+                };
+            });
+        };
+
+        const manejarClicAgregarAlCarrito = (e) => {
+            // Lógica de clic en el botón agregar al carrito
+            const addToCart = document.querySelectorAll('.add')   //Funcion del boton agregar al carrito, el unico requisito es estar registrado 
+            addToCart.forEach(button => {
+                button.onclick = e => {
+                    const id = button.dataset.cartId;
+                    fetch(`/productos/${id}`, { method: 'post' })
+                        .then(() => {
+                            alert('Se agrego el producto' + id + " al carrito")
+                            document.location.href = '/productos/listarProductos'
+                        })
+                        .catch(e => {
+                            alert(e)
+                        });
+                };
+            });
 
 
-        /////////////////////////////////////////////////////////////////////// FUNCION DE BUSQUEDA ////////////////////////////////////////////////////////////////////////////////////
-        //se realiza cuando un usuario    1- cambia el limite de pagina  2-Realiza una busqueda query  3-Busca por categoria 4-Ordena por nombre , precio o modifica la forma de ordenar
-        function searchPerform() {
+        };
+
+        const manejarBusqueda = () => {
+            // Lógica de búsqueda
+            console.log("entro")
             const page = document.querySelector('#page').value
             const limit = document.querySelector('#limit').value
             const query = document.querySelector('#query').value
@@ -230,95 +225,106 @@
             }
             console.log("page: " + page + "limit: " + limit)
             document.location.href = url
+
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        const manejarClicPaginacion = (event) => {
+            // Lógica de clic en la paginación
+            document.querySelector('#btnPrev').onclick = () => {
+                const prevPage = document.querySelector('#prevPage').value
+                const limit = document.querySelector('#limit').value
+                const query = document.querySelector('#query').value
+                const sortField = document.querySelector('#sortField').value
+                const sortOrder = document.querySelector('#sortOrder').value
+                const category = document.querySelector('#category').value.toUpperCase()
+                const stockOnly = document.querySelector('#stockOnly').checked
 
-        /////////////////////////////////////////////////////////////////////// PAGINACION  ////////////////////////////////////////////////////////////////////////////////////
-        //Funcion del boton pagina anterior,  permite volver a la pagina anterior, si estas en la pagina uno deshabilita el boton
-        document.querySelector('#btnPrev').onclick = () => {
-            const prevPage = document.querySelector('#prevPage').value
-            const limit = document.querySelector('#limit').value
-            const query = document.querySelector('#query').value
-            const sortField = document.querySelector('#sortField').value
-            const sortOrder = document.querySelector('#sortOrder').value
-            const category = document.querySelector('#category').value.toUpperCase()
-            const stockOnly = document.querySelector('#stockOnly').checked
+                if (btnPrev.classList.contains('disabled')) {
+                    return; // Evita la ejecución del código si el botón está deshabilitado
+                }
 
-            if (btnPrev.classList.contains('disabled')) {
-                return; // Evita la ejecución del código si el botón está deshabilitado
-            }
+                let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
 
-            let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(prevPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`
+                if (category) {
+                    url += `&category=${category}`
+                }
 
-            if (category) {
-                url += `&category=${category}`
-            }
+                if (stockOnly) {
+                    url += '&stockOnly=true'
+                }
 
-            if (stockOnly) {
-                url += '&stockOnly=true'
-            }
-
-            document.location.href = url
-        }
-        //Funcion del boton pagina siguiente o next m permite ir a la siguiente pagina, si estas en la ulitma pagina deshabilita el boton
-        document.querySelector('#btnNext').onclick = () => {
-            const nextPage = document.querySelector('#nextPage').value
-            const limit = document.querySelector('#limit').value
-            const query = document.querySelector('#query').value
-            const sortField = document.querySelector('#sortField').value
-            const sortOrder = document.querySelector('#sortOrder').value
-            const category = document.querySelector('#category').value.toUpperCase()
-            const stockOnly = document.querySelector('#stockOnly').checked
-
-            if (btnNext.classList.contains('disabled')) {
-                return; // Evita la ejecución del código si el botón está deshabilitado
-            }
-
-            let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
-
-            if (category) {
-                url += `&category=${category}`
-            }
-
-            if (stockOnly) {
-                url += '&stockOnly=true'
-            }
-
-            document.location.href = url
-        }
-        const pageLinks = document.querySelectorAll('.pagination .page-link')
-        pageLinks.forEach(link => {
-            link.addEventListener('click', (event) => {
-                event.preventDefault();
-                const clickedPage = link.getAttribute('data-value')
-                let url = `http://localhost:8080/productos/listarProductos?page=${clickedPage}`
                 document.location.href = url
-            })
-        })
-        //////////////////// La utilizo para la paginacion. para agregar la clse activa que pinta el numero  de pagina en el que estoy parado///////////////////////////////////////////
-        function updatePagination(activePage) {
-            const btnPrev = document.querySelector('#btnPrev')
-            const btnNext = document.querySelector('#btnNext')
-            const cantPaginas = document.querySelector('#cantPaginas').value
-            // Elimina la clase "active" de todos los elementos de página
-            const pageItems = document.querySelectorAll('.pagination .page-item');
-            pageItems.forEach(item => item.classList.remove('active'));
-
-            // Agrega la clase "active" al elemento de la página actual
-            const currentPageItem = document.querySelector(`.pagination .page-item a[data-value="${activePage}"]`);
-            if (currentPageItem) {
-                currentPageItem.parentNode.classList.add('active');
             }
+            //Funcion del boton pagina siguiente o next m permite ir a la siguiente pagina, si estas en la ulitma pagina deshabilita el boton
+            document.querySelector('#btnNext').onclick = () => {
+                const nextPage = document.querySelector('#nextPage').value
+                const limit = document.querySelector('#limit').value
+                const query = document.querySelector('#query').value
+                const sortField = document.querySelector('#sortField').value
+                const sortOrder = document.querySelector('#sortOrder').value
+                const category = document.querySelector('#category').value.toUpperCase()
+                const stockOnly = document.querySelector('#stockOnly').checked
 
-            const cant = cantPaginas.length - 1
-            // Deshabilita el botón "Previous" si estás en la primera página
+                if (btnNext.classList.contains('disabled')) {
+                    return; // Evita la ejecución del código si el botón está deshabilitado
+                }
 
-            btnPrev.classList.toggle('disabled', activePage == 1);
+                let url = `http://localhost:8080/productos/listarProductos?page=${parseInt(nextPage)}&limit=${limit}&query=${query}&sort=${sortField}&order=${sortOrder}`;
 
-            // Deshabilita el botón "Next" si estás en la ultima página
-            btnNext.classList.toggle('disabled', activePage == cant)
-        }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+                if (category) {
+                    url += `&category=${category}`
+                }
+
+                if (stockOnly) {
+                    url += '&stockOnly=true'
+                }
+
+                document.location.href = url
+            }
+            const pageLinks = document.querySelectorAll('.pagination .page-link')
+            pageLinks.forEach(link => {
+                link.addEventListener('click', (event) => {
+                    event.preventDefault();
+                    const clickedPage = link.getAttribute('data-value')
+                    let url = `http://localhost:8080/productos/listarProductos?page=${clickedPage}`
+                    document.location.href = url
+                })
+            })
+        };
+
+        const configurarEventListeners = () => {
+            const LimitSelected = document.querySelector('#limit')
+            LimitSelected.addEventListener('change', () => {
+                // Valida si el valor está fuera del rango permitido
+                if (LimitSelected.value < 1 || LimitSelected.value > 5) {
+                    // Restablece el valor al límite más cercano
+                    LimitSelected.value = Math.min(5, Math.max(1, LimitSelected.value));
+
+                }
+                manejarBusqueda()
+            })
+            categorySelect.addEventListener('change', () => {
+                manejarBusqueda()
+            })
+            stockOnlyCheckbox.addEventListener('change', () => {
+                manejarBusqueda()
+            })
+            atributoDeOrdenamiento.addEventListener('change', () => {
+                manejarBusqueda()
+            })
+            formaDeOrdenamiento.addEventListener('change', () => {
+                manejarBusqueda()
+            })
+            btnSearch.addEventListener('click', () => {
+                manejarBusqueda()
+            })
+        };
+
+        inicializarPagina()
+        manejarClicEliminar()
+        manejarClicAgregarAlCarrito()
+        configurarEventListeners()
+        manejarClicPaginacion()
+
     });
 </script>
