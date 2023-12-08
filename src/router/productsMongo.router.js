@@ -15,10 +15,10 @@ function sessionOpen(req, res, next) {
   next();
 }
 
-router.post('/', (req, res) => {
+router.post('/', async (req, res) => {
   try {
     const newProduct = req.body
-    productManagerMongo.AgregarProductos(newProduct)
+    await productManagerMongo.AgregarProductos(newProduct)
     res.redirect('/productos/listarProductos')
   } catch (error) {
     res.send('Error al crear el producto' + error)
