@@ -118,6 +118,10 @@
         const stockOnlyQueryParam = queryParams.get('stockOnly'); // Obtiene el valor de 'stockOnly' de la cadena de consulta  
         const stockOnlyCheckbox = document.querySelector('#stockOnly');
         const btnSearch = document.querySelector('#btnSearch')
+        btnSearch.id = btnSearch.id.toUpperCase(); // Convertir el ID a mayúsculas
+
+// Ahora btnSearch.id contiene el ID en mayúsculas
+console.log("ID en mayúsculas:", btnSearch.id);
         const atributoDeOrdenamiento = document.querySelector('#sortField')  // ordeno los campos por precio y nombre/titulo
         const formaDeOrdenamiento = document.querySelector('#sortOrder')  //indico si ordeno de mayor a menor o de menor a mayor
 
@@ -205,7 +209,6 @@
 
         const manejarBusqueda = () => {
             // Lógica de búsqueda
-            console.log("entro")
             const page = document.querySelector('#page').value
             const limit = document.querySelector('#limit').value
             const query = document.querySelector('#query').value

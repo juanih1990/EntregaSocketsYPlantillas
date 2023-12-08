@@ -30,14 +30,14 @@ class ProductManagerMongo {
             else {
                 //creo el producto
                 const product = {
-                    title: body.title,
-                    description: body.description,
+                    title: body.title.toUpperCase(),
+                    description: body.description.toUpperCase(),
                     price: body.price,
                     thumbnail: body.thumbnail,
-                    code: body.code,
+                    code: body.code.toUpperCase(),
                     stock: body.stock,
                     status: body.status !== undefined ? body.status : "true",
-                    category: body.category
+                    category: body.category.toUpperCase()
                 }
                 //agrego el producto
                 const result = await ProductsModel.create(product)
