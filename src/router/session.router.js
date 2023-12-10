@@ -45,6 +45,33 @@ router.post(
     }
 )
 
+router.get(
+    '/github' , 
+    passport.authenticate('github' , {scope: ['user:email']}),
+    async (req,res) => {
+        console.log("entre 2")
+
+})
+router.get(
+    '/githubcallback',
+    (req, res, next) => {
+        //Hice distinto el get que lo visto en clase por q a veces me redireccionaba antes q termine de loguear
+        // El middleware de autenticación de Passport se ejecutará
+        passport.authenticate('github', { failureRedirect: '/errorSession' })(req, res, next);
+    },
+    (req, res, next) => {
+        // Este middleware se ejecutará solo si la autenticación fue exitosa
+        console.log('callback', req.user);
+        req.session.user = req.user;
+        console.log('User session setted');
+        next(); // Llama a la siguiente función en la cadena de middleware
+    },
+    (req, res) => {
+        // Este middleware se ejecutará después de todas las acciones anteriores
+        res.redirect('/productos/listarProductos');
+    }
+)
+
 router.get('/logout', (req, res) => {
     if (req.isAuthenticated()) {
         // Si el usuario todavía está autenticado, espera a que la sesión se destruya

@@ -11,6 +11,7 @@ import session from 'express-session'
 import mongoStore from 'connect-mongo'
 import passport from 'passport'
 import initializePassport from './config/passport.config.js'
+import initializePassportGithub from './config/passportGithub.config.js'
 
 const app = express()
 app.use(express.json())
@@ -32,6 +33,9 @@ app.set('view engine', 'handlebars')
 
 app.use('/static', express.static(__dirname + '/public'))
 
+//App ID: 682738
+//Client ID: Iv1.5181b049f862794d
+// secret: e8581b59680234504826883a891cff50114b4ad3
 
 //Session
 app.use(session ({
@@ -47,6 +51,10 @@ app.use(session ({
   
 //passport
 initializePassport()
+app.use(passport.initialize())
+app.use(passport.session())
+ 
+initializePassportGithub()
 app.use(passport.initialize())
 app.use(passport.session())
  
