@@ -1,7 +1,11 @@
 import passport from 'passport'
 import local from 'passport-local'
-import userModel from '../dao/models/session.model.js'
+import userModel from '../dao/models/user.model.js'
 import { createHash, isValidatePassword } from '../util.js'
+import passportJWT from "passport-jwt"
+import { generateToken } from '../util.js' 
+
+const JWTSrategy = passportJWT.Strategy
 
 const LocalStrategy = local.Strategy
 
@@ -43,8 +47,10 @@ const initializePassport = () => {
 
              // Verificar si es el usuario administrador
              if (username === 'admin@gmail.com' && password === 'admin1234') {
-                const admin = { email: 'admin@gmail.com', password: 'admin1234' };             
-                return done(null, admin);
+                const user = { email: 'admin@gmail.com', password: 'admin1234' };   
+                const token = generateToken(user)
+                user.token = token          
+                return done(null, user);
             }
 
             const user = await userModel.findOne({ email: username }).lean().exec()
@@ -60,10 +66,21 @@ const initializePassport = () => {
                 console.error('password not valid')
                 return done(null, false)
             }
+
+              
+            const token = generateToken(user)
+            user.token = token
             return done(null, user)
         } catch (error) {
             return done('Error login' + error)
         }
+    }))
+
+    passport.use('jwt' , new JWTSrategy({
+        jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([req => req?.cookies?.cookieJWT ?? null]),
+        secretOrKey: 'secretForJwt'
+    }, (jwt_payload,done) => {
+        done(null,jwt_payload)
     }))
 
     passport.serializeUser((user, done) => {

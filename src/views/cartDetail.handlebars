@@ -1,10 +1,11 @@
 <div>
-    {{#if result}}
-    <h2>Carrito ID: {{result.[0]._id}}</h2>
+    {{#if user}}
+
+    <h2>Carrito ID: {{user._id}}</h2>
     <hr>
-    <input id="idCarrito" type="hidden" value="{{result.[0]._id}}">
+    <input id="idCarrito" type="hidden" value="{{user._id}}">
     <ul>
-        {{#each result.[0].productos}}
+        {{#each user.productos}}
         <hr>
         <li><span>Producto: {{this.pid.title}}</span></li>
         <li><span>Precio: {{this.pid.price}}</span></li>

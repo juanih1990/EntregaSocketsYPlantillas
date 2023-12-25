@@ -1,16 +1,14 @@
 import { Router } from 'express'
 import CartManagerMongo from '../dao/managers/managersMongo/CartManagersMongo.js'
 import CartModel from '../dao/models/cart.model.js'
-import session from 'express-session'
+import userModel from '../dao/models/user.model.js'
+import passport from 'passport'
+
 
 const router = Router()
 const cartManagerMongo = new CartManagerMongo()
 
-function sessionOpen(req, res, next) {
-  res.locals.session = req.session;
-  res.locals.isAdmin = req.session?.user?.email === 'admin@gmail.com' && req.session?.user?.password === 'admin1234'
-  next();
-}
+
 
 
 router.delete('/cart/:_id', async (req, res) => {
@@ -34,71 +32,114 @@ router.delete('/cart/:_id/products/:pid', async (req, res) => {
   }
 })
 
-//crea el carrito cuado dan click en agregar producto.  dentro de localhost:8080/productos
-router.post('/:pid', async (req, res) => {
-  try {
-    const { pid } = req.params
-    await cartManagerMongo.createCart(pid)
-    res.redirect('/productos/listarProductos')
-  } catch (error) {
-    res.send('Error al agregar el producto al carrito' + error)
-  }
-})
 
-router.get('/cart', sessionOpen ,async (req, res) => {
-  const limit = parseInt(req.query?.limit ?? 4)
-  const page = parseInt(req.query?.page ?? 1)
-  const query = req.query?.query ?? ''
-  const sortField = req.query?.sort ?? 'title';
-  const sortOrder = req.query?.order ?? 'asc';
-  const category = req.query?.category || '';
-  const stockOnly = req.query?.stockOnly === 'true';
-  const search = {}
-  if (category) {
-    search.category = category
-  }
+router.post(
+  '/:pid',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { user } = req
+      const { pid } = req.params
 
-  if (stockOnly) {
-    search.stock = { $gt: 0 }
-  }
-
-  if (query) search.title = { "$regex": query, "$options": "i" }
+      const existingUser = await userModel.findById(user.user._id);
 
 
-  const result = await CartModel.paginate(search, {
-    page,
-    limit,
-    sort: { [sortField]: sortOrder },
-    lean: true
+      if (existingUser.cart.length > 0) {
+        const cartOpen = await CartModel.findOne({ finalizado: false , user: user.user._id })
+
+        if (cartOpen !== null && (!cartOpen.finalizado)) {
+          // Busca si el producto ya existe en el carrito
+          const existingProduct = cartOpen.productos.find(
+            (product) => product.pid.toString() === pid
+          );
+          if (existingProduct) {
+            // Si el producto ya existe, incrementa la cantidad
+            existingProduct.quantity += 1;
+          } else {
+            // Si el producto no existe, agrégalo al carrito con una cantidad de 1
+            cartOpen.productos.push({
+              pid: pid,
+              quantity: 1,
+            });
+          }
+          await cartOpen.save(); // Guarda los cambios en el carrito
+          return res.redirect('/productos/listarProductos')
+        }
+      }
+
+      // const newcart = await cartManagerMongo.createCart(pid)
+      const newcart = new CartModel({
+        user: existingUser._id,
+        productos: [
+          {
+            pid: pid,
+            quantity: 1,
+          },
+        ],
+      });
+      await newcart.save();
+      const userId = existingUser._id;
+      await userModel.findOneAndUpdate(
+        { _id: userId },
+        { $push: { cart: newcart._id } },
+        { new: true }
+      );
+
+      res.redirect('/productos/listarProductos')
+    } catch (error) {
+      res.send('Error al agregar el producto al carrito' + error)
+    }
   })
 
-
-  result.cartItem = result.docs
-  result.query = ""
-  delete result.docs
-
-  res.render('cart', { result  , admin: res.locals.isAdmin})
-})
-
-router.get('/cart/:_id', sessionOpen , async (req, res) => {
-    const { _id } = req.params;
-    const result = await cartManagerMongo.getCart(_id)
-    res.render('cartDetail', { result });
-});
-
-router.get('/cart/:_id/products/:pid' , sessionOpen , async(req,res) =>{
-  const { _id , pid } = req.params;
-  
-  const result = await cartManagerMongo.getCartDetailProduct(_id,pid)
-
+router.get(
+  '/cart',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    try {
+      const { user } = req;
  
-    const { title, price, description, stock, thumbnail, code, category } = result.pid
+      const existingUser = await userModel.findById(user.user._id).populate('cart').lean().exec()
 
+      const matchCart = await CartModel.find({ user: user.user._id }).lean().exec()
+
+      matchCart.forEach(cart => {
+        if (existingUser.cart !== null && cart.user == user.user._id) {
+          res.render('cart', { user: existingUser.cart });
+        } else {
+          res.render('cart', { user: null });
+        }
+      })
+
+    } catch (error) {
+      // Maneja cualquier error que ocurra durante la consulta
+      res.send('Error al obtener el carrito: ' + error);
+    }
+  }
+)
+
+router.get(
+  '/cart/:_id',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const { _id } = req.params
+    const result = await cartManagerMongo.getCart(_id)
+    res.render('cartDetail', { user : result });
+  });
+
+router.get(
+  '/cart/:_id/products/:pid',
+  passport.authenticate('jwt', { session: false }),
+  async (req, res) => {
+    const { _id, pid } = req.params;
+
+    const result = await cartManagerMongo.getCartDetailProduct(_id, pid)
+
+    const { title, price, description, stock, thumbnail, code, category } = result.pid
     const { quantity } = result
 
     // Crear un nuevo objeto con las propiedades deseadas
     const producto = {
-      pid ,
+      pid,
       _id,
       title,
       price,
@@ -110,12 +151,10 @@ router.get('/cart/:_id/products/:pid' , sessionOpen , async(req,res) =>{
       category
     };
 
-    console.log(producto);
-  
-  res.render('cartProductDetail',  { producto } )
-})
+    res.render('cartProductDetail', { user: producto })
+  })
 
-router.put('/cart/:_id', async (req, res) => {   // este endpoint lo deje para trabajarlo por posman por que no le vi mucho sentido para implementarlo en las vistas.   
+router.put('/cart/:_id', async (req, res) => {
   try {
     const { _id } = req.params
     const updateData = req.body // Esto contiene los datos enviados desde Postman
@@ -128,21 +167,6 @@ router.put('/cart/:_id', async (req, res) => {   // este endpoint lo deje para t
 
     return res.json({ status: 'success', updatedCart });
 
-    //en raw elegir el formato json y pasar algo asi 
-    // en la ruta /cart/ aca va el id del carrito lo podes encontrar cuando das al boton mostrar carrito. te va a mostrar la id del mismo para que puedas copiar y pegarlo 
-    /*{
-      "productos": [
-        {
-          "pid": "id_del_producto",  en este campo pone la id del producto completo que quieras agregar al carrito.
-          "quantity": 2
-        },
-        {
-          "pid": "otro_id_de_producto",
-          "quantity": 3
-        }
-      ],
-      "finalizado": true
-    }*/
 
   } catch (error) {
     res.status(500).json({ error: 'Error interno del servidor' })
@@ -154,9 +178,8 @@ router.put('/cart/:_id/products/:pid', async (req, res) => {
   try {
     const { _id, pid } = req.params
     const { operacion } = req.query
-    console.log(operacion ,  _id , pid)
-    await cartManagerMongo.updateCantCart(_id,pid,operacion)    //actualizo la cantidad del producto en el carrito
-    
+    await cartManagerMongo.updateCantCart(_id, pid, operacion)    //actualizo la cantidad del producto en el carrito
+
     return res.json({ status: "success" })
   } catch (error) {
     console.error('Error al actualizar el producto del carrito', error)

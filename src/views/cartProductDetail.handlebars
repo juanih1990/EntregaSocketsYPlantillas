@@ -1,16 +1,16 @@
 <div>
 
-    {{#if producto}}
-    <input id="idCarrito" type="hidden" value="{{producto._id}}">
+    {{#if user}}
+    <input id="idCarrito" type="hidden" value="{{user._id}}">
     <ul>
         <hr>
-        <li><span>Producto: {{producto.title}}</span></li>
-        <li><span>Precio: {{producto.price}}</span></li>
-        <li><span>Categoria: {{producto.category}}</span></li><br><br>
+        <li><span>Producto: {{user.title}}</span></li>
+        <li><span>Precio: {{user.price}}</span></li>
+        <li><span>Categoria: {{user.category}}</span></li><br><br>
         <li>
-            <button id="restar" data-subtract-num="{{producto.pid}}">-</button>
-            <span id="quantity" data-value="{{producto.quantity}}"> Cantidad: {{producto.quantity}}</span>
-            <button id="sumar" data-add-num="{{producto.pid}}">+</button>
+            <button id="restar" data-subtract-num="{{user.pid}}">-</button>
+            <span id="quantity" data-value="{{user.quantity}}"> Cantidad: {{user.quantity}}</span>
+            <button id="sumar" data-add-num="{{user.pid}}">+</button>
         </li>
         <hr>
     </ul>
@@ -25,7 +25,6 @@
 
             const pid = button.dataset.addNum
             const idcart = document.querySelector('#idCarrito').value
-            console.log(pid + idcart)
             fetch(`/productos/cart/${idcart}/products/${pid}?operacion=sumar`, { method: 'put' })
                 .then(() => {
                     document.location.href = `/productos/cart/${idcart}/products/${pid}`
@@ -43,12 +42,9 @@
             const cantidad = parseInt(cantidadSpan.getAttribute('data-value'), 10)
             const pid = button.dataset.subtractNum
             const idcart = document.querySelector('#idCarrito').value
-            console.log(pid + idcart + cantidad)
             if (cantidad > 1) {
-                console.log("entro a cantidad mayor a 1")
                 fetch(`/productos/cart/${idcart}/products/${pid}?operacion=restar`, { method: 'put' })
                     .then(() => {
-                        console.log("producto actualizado")
                         document.location.href = `/productos/cart/${idcart}/products/${pid}`
                     })
                     .catch(e => {

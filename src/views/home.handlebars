@@ -16,7 +16,7 @@
         </div>
         <div>
             <div>
-                
+
                 <label for="category">Categoría:</label> {{!-- lo ideal es traer todas las categorias existentes de mi
                 base de datos (lo voy a ser con tiempo) --}}
                 <select id="category" name="category">
@@ -120,8 +120,8 @@
         const btnSearch = document.querySelector('#btnSearch')
         btnSearch.id = btnSearch.id.toUpperCase(); // Convertir el ID a mayúsculas
 
-// Ahora btnSearch.id contiene el ID en mayúsculas
-console.log("ID en mayúsculas:", btnSearch.id);
+        // Ahora btnSearch.id contiene el ID en mayúsculas
+        console.log("ID en mayúsculas:", btnSearch.id);
         const atributoDeOrdenamiento = document.querySelector('#sortField')  // ordeno los campos por precio y nombre/titulo
         const formaDeOrdenamiento = document.querySelector('#sortOrder')  //indico si ordeno de mayor a menor o de menor a mayor
 
@@ -195,8 +195,10 @@ console.log("ID en mayúsculas:", btnSearch.id);
                     const id = button.dataset.cartId;
                     fetch(`/productos/${id}`, { method: 'post' })
                         .then(() => {
-                            alert('Se agrego el producto' + id + " al carrito")
-                            document.location.href = '/productos/listarProductos'
+                            agregarAlCarrito()
+                            setTimeout(function () {
+                                document.location.href = '/productos/listarProductos'
+                            }, 2000);
                         })
                         .catch(e => {
                             alert(e)
@@ -330,4 +332,7 @@ console.log("ID en mayúsculas:", btnSearch.id);
         manejarClicPaginacion()
 
     });
+
 </script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="/static/homeSweetAlert.js"></script>

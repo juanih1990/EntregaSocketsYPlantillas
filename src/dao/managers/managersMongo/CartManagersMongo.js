@@ -7,32 +7,10 @@ class CardManagersMongo {
         this.product = []
     }
 
-    getCart = async () => {
+    getCart = async (id) => {
         try {
-            const carts = await CartMongo.find();
-            return carts.map((cart) => {
-                return {
-                    _id: cart._id,
-                    productos: cart.productos.map((producto) => {
-                        if (producto && producto.pid && producto.pid._id) {
-                            return {
-                                _id: producto._id,
-                                pid: {
-                                    _id: producto.pid._id,
-                                    title: producto.pid.title,
-                                    price: producto.pid.price,
-                                    category: producto.pid.category
-                                },
-                                quantity: producto.quantity,
-                            };
-                        } else {
-                            // Manejar el caso cuando producto.pid o producto.pid._id es null
-                            return null;
-                        }
-                    }).filter((producto) => producto !== null), // Filtrar elementos nulos
-                    // Agrega otros campos del carrito si los necesitas
-                };
-            });
+            const carts = await CartMongo.findById(id).populate('productos.pid').lean().exec();
+            return carts
         } catch (error) {
             console.error('Error al obtener carritos:', error)
             throw error; // Propaga el error para manejarlo en el router

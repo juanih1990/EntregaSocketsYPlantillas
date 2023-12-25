@@ -18,7 +18,7 @@
             <a class="navbar-brand" href="/productos/nuevoProducto">Agregar Productos</a>
             {{/if}}
              
-              {{#unless session.user }}
+              {{#unless user }}
               <a class="navbar-brand" href="/">Login</a>
               {{/unless}}
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
@@ -30,7 +30,7 @@
                     <a class="nav-link active" aria-current="page" href="/productos/listarProductos">Productos</a>
                     <a class="nav-link" href="/productos/cart">Carrito</a>
                     <a class="nav-link" href="/productos/chat">Chat</a>
-                    {{#if session.user}}
+                    {{#if user}}
                     <a class="nav-link" aria-disabled="true" href="/logout">logout</a>
                      {{/if}}
                 </div>

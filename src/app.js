@@ -12,6 +12,7 @@ import mongoStore from 'connect-mongo'
 import passport from 'passport'
 import initializePassport from './config/passport.config.js'
 import initializePassportGithub from './config/passportGithub.config.js'
+import cookieParser from 'cookie-parser'
 
 const app = express()
 app.use(express.json())
@@ -20,24 +21,18 @@ app.use(express.urlencoded({ extended: true }))
 //mongoose
 const mongoURL = 'mongodb+srv://juanih1990:963258527415963@clustercursobackend.ddoeaet.mongodb.net/'
 const mongoDBName = 'productos'
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
 
-
+//handlebars
 app.engine('handlebars', handlebars.engine())
 //seteo las vistas 
 app.set('views', __dirname + '/views')
 //indicamos que motor de plantilla usar
 app.set('view engine', 'handlebars')
-
-
 app.use('/static', express.static(__dirname + '/public'))
 
-//App ID: 682738
-//Client ID: Iv1.5181b049f862794d
-// secret: e8581b59680234504826883a891cff50114b4ad3
-
 //Session
+app.use(cookieParser())
+
 app.use(session ({
     store: mongoStore.create({
         mongoUrl: mongoURL,
@@ -58,21 +53,10 @@ initializePassportGithub()
 app.use(passport.initialize())
 app.use(passport.session())
  
-// Middleware para usuarios normales
-function Auth(req, res, next) {
-    if (req.session?.user) {
-        return next();
-    } else {
-        res.status(401);
-        return res.render('errorSession',  {});
-    }
-}
-
-
 app.use('/' , sessionRouter )
-app.use('/productos' , Auth, ProductsMongo) 
-app.use('/productos' , Auth, chatMongo) 
-app.use('/productos' , Auth, CartMongo) 
+app.use('/productos' ,  ProductsMongo) 
+app.use('/productos' ,  chatMongo) 
+app.use('/productos' , CartMongo) 
 
 
 //conexion mongo
